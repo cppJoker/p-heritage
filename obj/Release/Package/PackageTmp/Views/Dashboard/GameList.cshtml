@@ -1,0 +1,134 @@
+﻿@model Projet_Heritage.ViewModel.DashboardGameListViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="modal fade" id="waitPleaseModal" tabindex="-1" data-backdrop="static" role="dialog" data-keyboard="false" aria-labelledby="waitPleaseModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Chargement en cours...</h5>
+            </div>
+            <div class="modal-body">
+                <label>Veuillez ne pas quitter cette page.<br>La plateforme est entrain de recevoir votre demande.</label>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="table-bg">
+    <h2>Jeux</h2>
+    <hr />
+    <table id="gamesTable" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Remise</th>
+                <th>Membres</th>
+                <th>Matière</th>
+                <th>Groupe</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var game in Model.Games)
+            {
+                <tr>
+                    @{
+                        DateTime endDate = Model.HandInDateTime;
+                        DateTime published = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(game.DatePublished, TimeZoneInfo.Local.Id, "Eastern Standard Time");
+                        if (published > endDate)
+                        {
+                            <td><a href="/Game?id=@game.Id" style="color:red">@game.Name<br>(en retard)</a></td>
+                        }
+                        else
+                        {
+                            <td><a href="/Game?id=@game.Id">@game.Name</a></td>
+                        }
+                        <td>@published.ToString("yyyy/MM/dd")<br>@published.ToString("HH:mm")</td>
+                    }
+                    <td>@game.TeamMembers</td>
+                    <td>
+                        @game.Modules
+                    </td>
+                    <td>@game.Group</td>
+                    <td>
+                        <button data-game-id="@game.Id" style="display: block;" class="btn btn-sm btn-warning js-update">Modifier</button>
+                        <button data-game-id="@game.Id" style="display: block; margin-top: 10px" class="btn btn-sm btn-danger js-delete">Supprimer</button>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+    <hr style="margin-bottom: 5px" />
+    <a style="font-size: 12px; color: dimgray" href="mailto: mohamedanis.laghrour@("@")protic.net">&#169; 2021 M. A. Laghrour</a>
+</div>
+
+@section scripts
+{
+        <script>
+            $(document).ready(function () {
+                $("#gameListNavItem").addClass("active font-weight-bold");
+                var table = $('#gamesTable').DataTable({
+                    "language": {
+                        "lengthMenu": "Montrer _MENU_  jeux par page",
+                        "zeroRecords": "Aucun jeu trouvé",
+                        "info": "Page _PAGE_ de _PAGES_",
+                        "infoEmpty": "Aucun jeu disponible",
+                        "infoFiltered": "(filtré de _MAX_ jeux)",
+                        "search": "Rechercher:",
+                        "paginate": {
+                            "first": "Premier",
+                            "last": "Dernier",
+                            "next": "Suivant",
+                            "previous": "Précédent"
+                        },
+                        "loadingRecords": "Chargement des jeux...",
+                        "processing": "Chargement des jeux...",
+                        "aria": {
+                            "sortAscending": ": Activer pour un filtrage ascendant",
+                            "sortDescending": ": Activer pour un filtrage descendant"
+                        }
+                    }
+                });
+
+                $("#gamesTable").on("click",
+                    ".js-delete",
+                    function () {
+                        var button = $(this);
+                        bootbox.confirm({
+                            message: "Êtes-vous sûr de vouloir supprimer ce jeu?",
+                            buttons: {
+                                confirm: {
+                                    label: 'Oui',
+                                    className: 'btn btn-sm btn-warning'
+                                },
+                                cancel: {
+                                    label: 'Non',
+                                    className: 'btn btn-sm btn-secondary'
+                                }
+                            },
+                            callback: function (result) {
+                                if (result) {
+                                    $.ajax({
+                                        url: "/api/global/" + button.attr("data-game-id"),
+                                        method: "DELETE",
+                                        success: function () {
+                                            table.row(button.parents("tr")).remove().draw();
+                                            location.reload();
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    });
+                $("#gamesTable").on("click",
+                    ".js-update",
+                    function () {
+                        var button = $(this);
+                        window.location.href = "/Dashboard/GameEdit?id=" + button.attr("data-game-id");
+                    });
+
+            });
+        </script>
+    }

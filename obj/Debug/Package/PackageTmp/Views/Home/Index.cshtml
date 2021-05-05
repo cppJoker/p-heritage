@@ -1,0 +1,52 @@
+﻿@model Projet_Heritage.Models.PlatformSetting
+@{
+    ViewBag.Title = "Home Page";
+}
+<style>
+    .globalBtn {
+        box-shadow: 5px 5px 38px -12px rgba(86,86,86,0.95);
+    }
+</style>
+
+<div id="schoolImgBack" class="jumbotron" style="margin-top: 40px; padding-top: 25px">
+    <h1 class="display-4">@Model.MainTitle <i class="@Model.MainTitleIcon"></i></h1>
+    <p class="lead">@Model.MainSubTitle</p>
+    <hr class="my-4">
+    @{
+        WriteLiteral(new HtmlString(HttpUtility.HtmlDecode(Model.MainDescription)));
+    }
+    <hr class="my-4">
+    <div class="btn-toolbar" style="height: 50px">
+        <button id="gameListBtn" style="display: none; margin-right: 10px; outline: none" class="glow-on-hover" style="margin-right: 15px" type="button">Voir les jeux »</button>
+        <button id="gameAddBtn" style="display: none; outline: none" class="glow-on-hover" type="button">Ajouter un jeu »</button>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $("#gameListBtn").hide();
+            $("#gameAddBtn").hide();
+            $("#gameListBtn").on("click",
+                function (e) {
+                    window.location.pathname = "/Game/List";
+                });
+            $("#gameAddBtn").on("click",
+                function (e) {
+                    window.location.pathname = "/Game/New";
+                });
+            $.ajax({
+                type: "GET",
+                url: 'api/global/key/freekeys',
+                success: function(response) {
+                    if (response === 0)
+                        $("#gameAddBtn").remove();
+                    else
+                        $("#gameAddBtn").fadeIn(1000);
+                    $("#gameListBtn").fadeIn(1000);
+                }
+            });
+        });
+    </script>
+}

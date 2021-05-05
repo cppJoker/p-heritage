@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "mssql2": {
+      "type": "mssql.onprem",
+      "connectionId": "ProductionDB",
+      "secretStore": "LocalSecretsFile"
+    },
+    "mssql1": {
+      "resourceId": null,
+      "type": "mssql.local",
+      "connectionId": "LocalDB",
+      "secretStore": null
+    }
+  }
+}

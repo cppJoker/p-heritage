@@ -1,0 +1,122 @@
+﻿@model Projet_Heritage.ViewModel.GamePageViewModel
+@{
+    ViewBag.Title = "Game";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div>
+    <div class="card mt-4" style="box-shadow: 0px 5px 25px 17px rgba(0,0,0,0.15);">
+        <img class="card-img-top img-fluid" src="@Model.Game.largeImagePath.Replace("~","")" alt="">
+        <div class="card-body">
+            <h3 class="card-title">@Model.Game.Name</h3>
+            <h6>@Model.Game.TeamMembers</h6>
+            Matière: @Model.Game.Modules (@Model.Game.yearContent)
+            <br>
+            Thème: @Model.Game.Theme
+            <br />
+            <br />
+            <p class="card-text">@Model.Game.Description</p>
+        </div>
+        <div class="btn-toolbar align-self-end mt-auto m-2" role="group">
+            @if (@Model.Game.GuideLink != null)
+            {
+                <a href="@Model.Game.GuideLink" type="button" class="btn btn-info mr-1" target="_blank"><i class="fas fa-clipboard-list"></i> Mode d'emploi</a>
+            }
+            @if (@Model.Game.FormLink != null)
+            {
+                <a href="@Model.Game.FormLink" type="button" class="btn btn-info mr-1" target="_blank"><i class="far fa-check-circle"></i> Remplir le sondage</a>
+            }
+            <a href="@Model.Game.SolutionLink" type="button" class="btn btn-info mr-4" target="_blank"><i class="fas fa-binoculars"></i> Solutionnaire</a>
+            @if (@Model.Game.resourcePath != null)
+            {
+                <a href="@Model.Game.resourcePath" type="button" class="btn btn-dark mr-1" target="_blank"><i class="fas fa-file-download"></i> Télécharger le fichier</a>
+            }
+            <a href="@Model.Game.Link" type="button" class="btn btn-primary mr-1" target="_blank"><i class="fas fa-running"></i> Accéder au jeu!</a>
+        </div>
+    </div>
+    <!-- /.card -->
+
+    <div class="card card-outline-secondary my-4" style="box-shadow: 0px 5px 25px 17px rgba(0,0,0,0.15);">
+        <div class="card-header">
+            Commentaires
+        </div>
+        <div class="card-body">
+            @{
+                if (Model.Reviews.Count == 0)
+                {
+                    <p>Aucun commentaire pour l'instant.</p>
+                }
+                else
+                {
+                    var i = 0;
+                    foreach (var review in Model.Reviews)
+                    {
+                        i++;
+                        <p>@review.Content</p>
+                        <small class="text-muted">@review.Authors (@review.Published.ToString("dd/MM/yyyy"))</small>
+                        if (i != Model.Reviews.Count)
+                        {
+                            <hr>
+                        }
+                    }
+                }
+
+
+            }
+        </div>
+    </div>
+    <!-- /.card -->
+    <div class="card card-outline-secondary my-4" style="box-shadow: 0px 5px 25px 17px rgba(0,0,0,0.15);">
+        <div class="card-header">
+            Laisser un commentaire
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12">
+                    @if (Model.HadError)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show col-md-7" role="alert">
+                            <strong>Attention!</strong><br>Votre code d'équipe n'est pas accepté: il doit etre valide et non-utilisé!
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    }
+                    @using (Html.BeginForm("SendComment", "Game"))
+                    {
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Key)
+                            @Html.TextBoxFor(m => m.Key, new
+                            {
+                                @class = "form-control col-md-7"
+                            })
+
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Comment.Content)
+                            @Html.TextAreaFor(m => m.Comment.Content, new
+                            {
+                                @class = "form-control col-md-7"
+                            })
+                        </div>
+                        @Html.HiddenFor(m => m.Game.Id)
+                        <div class="form-group">
+                            <button type="submit" class="btn col-md-7 btn-sm btn-outline-info form-control"><i class="fa fa-comment-alt"></i> Envoyer (non-modifiable après l'envoi)</button>
+                        </div>
+
+                    }
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+}

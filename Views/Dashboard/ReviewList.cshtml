@@ -1,0 +1,119 @@
+﻿@model IEnumerable<Projet_Heritage.ViewModel.ReviewGameViewModel>
+@{
+    ViewBag.Title = "ReviewList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="table-bg">
+    <h2>Commentaires</h2>
+    <hr />
+    <div class="modal fade" id="waitPleaseModal" tabindex="-1" data-backdrop="static" role="dialog" data-keyboard="false" aria-labelledby="waitPleaseModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Chargement en cours...</h5>
+                </div>
+                <div class="modal-body">
+                    <label>Veuillez ne pas quitter cette page.<br>La plateforme est entrain de recevoir votre demande.</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <table id="keyTable" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Commentaire</th>
+                <th>Publication</th>
+                <th>Auteur</th>
+                <th>Jeu</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pair in Model)
+            {
+                <tr>
+                    <td>@pair.Review.Content</td>
+                    @{
+                        DateTime published = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(pair.Review.Published, TimeZoneInfo.Local.Id, "Eastern Standard Time");
+                        <td>@published.ToString("yyyy/MM/dd")<br>@published.ToString("HH:mm")</td>
+                    }
+                    <td>@pair.Review.Authors</td>
+                    <td>
+                        <a href="/Game?id=@pair.Game.Id">@pair.Game.Name</a>
+                    </td>
+                    <td>
+                        <button data-customer-id="@pair.Review.Id" class="btn btn-sm btn-danger js-delete">Supprimer</button>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+    <hr style="margin-bottom: 5px" />
+    <a style="font-size: 12px; color: dimgray" href="mailto: mohamedanis.laghrour@("@")protic.net">&#169; 2021 M. A. Laghrour</a>
+</div>
+
+    @section scripts
+{
+        <script>
+            $(document).ready(function () {
+                $("#commentListNavItem").addClass("active font-weight-bold");
+                var table = $('#keyTable').DataTable({
+                    "language": {
+                        "lengthMenu": "Montrer _MENU_  commentaires par page",
+                        "zeroRecords": "Aucun commentaire trouvé",
+                        "info": "Page _PAGE_ de _PAGES_",
+                        "infoEmpty": "Aucun commentaire disponible",
+                        "infoFiltered": "(filtré de _MAX_ jeux)",
+                        "search": "Rechercher:",
+                        "paginate": {
+                            "first": "Premier",
+                            "last": "Dernier",
+                            "next": "Suivant",
+                            "previous": "Précédent"
+                        },
+                        "loadingRecords": "Chargement des commentaires...",
+                        "processing": "Chargement des commentaires...",
+                        "aria": {
+                            "sortAscending": ": Activer pour un filtrage ascendant",
+                            "sortDescending": ": Activer pour un filtrage descendant"
+                        }
+                    }
+                });
+                $("#keyTable").on("click",
+                    ".js-delete",
+                    function () {
+                        var button = $(this);
+                        bootbox.confirm({
+                            message: "Êtes-vous sûr de vouloir supprimer ce commentaire?",
+                            buttons: {
+                                confirm: {
+                                    label: 'Oui',
+                                    className: 'btn btn-sm btn-warning'
+                                },
+                                cancel: {
+                                    label: 'Non',
+                                    className: 'btn btn-sm btn-secondary'
+                                }
+                            }
+                            ,
+                            callback: function (result) {
+                                if (result) {
+                                    jQuery.noConflict();
+                                    $('#waitPleaseModal').modal('show');
+                                    $.ajax({
+                                        url: "/api/global/review/" + button.attr("data-customer-id"),
+                                        method: "DELETE",
+                                        success: function () {
+                                            $('#waitPleaseModal').modal('hide');
+                                            table.row(button.parents("tr")).remove().draw();
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    });
+
+            });
+        </script>
+    }

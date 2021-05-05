@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+    <!-- bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.5.2/materia/bootstrap.min.css">
+    <script>
+      function autocomplete(inp, arr) {
+  var d = document.getElementById('autocomplete');
+  d.classList.add('list-group', 'position-relative', 'd-print-inline-block');
+  var currentFocus;
+  inp.addEventListener('input', function(e) {
+    var a, b, i, val = this.value;
+
+    closeAllLists();
+    if (!val) {
+      return false;
+    }
+    currentFocus = -1;
+
+    a = document.createElement('DIV');
+    a.setAttribute('class', 'autocomplete-items');
+    a.classList.add('position-absolute', 'mt-2', 'w-100', 'rounded', 'shadow-sm');
+    a.style.top = '100%';
+    a.style.zIndex = 99;
+
+    this.parentNode.appendChild(a);
+    for (i = 0; i < arr.length; i++) {
+      if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+        b = document.createElement('LI');
+        b.classList.add('list-group-item');
+        b.innerHTML = '<strong>' + arr[i].substr(0, val.length) + '</strong>';
+        b.innerHTML += arr[i].substr(val.length);
+        b.innerHTML += '<input type="hidden" value="' + arr[i] + '">';
+        b.addEventListener('click', function(e) {
+          inp.value = this.getElementsByTagName('input')[0].value;
+          closeAllLists();
+        });
+        a.appendChild(b);
+      }
+    }
+  });
+  inp.addEventListener('keydown', function(e) {
+    var x = document.getElementById(this.id);
+    if (x) {
+      x = x.getElementsByTagName('div');
+    }
+    if (e.keyCode == 40) {
+      currentFocus++;
+      addActive(x);
+    }
+    else if (e.keyCode == 38) {
+      currentFocus--;
+      addActive(x);
+    }
+    else if (e.keyCode == 13) {
+      e.preventDefault();
+      if (currentFocus > -1) {
+        if (x) {
+          x[currentFocus].click();
+        }
+      }
+    }
+  });
+
+  function addActive(x) {
+    if (!x) {
+      return false;
+    }
+    removeActive(x);
+    if (currentFocus >= x.length) {
+      currentFocus = 0;
+    }
+    if (currentFocus < 0) {
+      currentFocus = (x.length - 1);
+    }
+    x[currentFocus].classList.add('active');
+  }
+
+  function removeActive(x) {
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove('active');
+    }
+  }
+
+  function closeAllLists(el) {
+    var x = document.getElementsByClassName('autocomplete-items');
+    for (var i = 0; i < x.length; i++) {
+      if (el != x[i] && el != inp) {
+        x[i].parentNode.removeChild(x[i]);
+      }
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    closeAllLists(e.target);
+  });
+}
+    </script>
+    <title>Minimalist Autocomplete Bootstrap 4 Plugin Example</title>
+    <style>
+      body {background-color: #fafafa; }
+      .container { margin: 150px auto; max-width: 640px; }
+      label { font-size: 1rem; }
+      input { background-color: #EDF2F7 !important;padding: 0 1rem !important; }
+    </style>
+  </head>
+  <body><div id="jquery-script-menu">
+<div class="jquery-script-center">
+<ul>
+<li><a href="https://www.jqueryscript.net/form/minimal-autocomplete-bootstrap.html">Download This Plugin</a></li>
+<li><a href="https://www.jqueryscript.net/">Back To jQueryScript.Net</a></li>
+</ul><div id="carbon-block"></div>
+<div class="jquery-script-ads"><script type="text/javascript"><!--
+google_ad_client = "ca-pub-2783044520727903";
+/* jQuery_demo */
+google_ad_slot = "2780937993";
+google_ad_width = 728;
+google_ad_height = 90;
+//-->
+</script>
+<script type="text/javascript"
+src="https://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></div>
+<div class="jquery-script-clear"></div>
+</div>
+</div>
+  <div class="container">
+    <h1>Minimalist Autocomplete Bootstrap 4 Plugin Example</h1>
+    <p class="lead">An ultra-light and blazing fast autocomplete plugin for Bootstrap 4 framework. Written in Vanilla JavaScript. jQuery and Bootstrap JS are OPTIONAL.</p>
+  <form autocomplete="off">
+    <div class="form-group">
+      <div id="autocomplete">
+      <label>Select A Country</label>
+      <input id="search" type="text" placeholder="Search countries..." class="form-control">
+    </div>
+    </div>
+  </form>
+  <script defer>
+    const arr = [
+  "Afghanistan",
+  "Åland Islands",
+  "Albania",
+  "Algeria",
+  "American Samoa",
+  "Andorra",
+  "Angola",
+  "Anguilla",
+  "Antarctica",
+  "Antigua and Barbuda",
+  "Argentina",
+  "Armenia",
+  "Aruba",
+  "Australia",
+  "Austria",
+  "Azerbaijan",
+  "Bahamas (the)",
+  "Bahrain",
+  "Bangladesh",
+  "Barbados",
+  "Belarus",
+  "Belgium",
+  "Belize",
+  "Benin",
+  "Bermuda",
+  "Bhutan",
+  "Bolivia (Plurinational State of)",
+  "Bonaire, Sint Eustatius and Saba",
+  "Bosnia and Herzegovina",
+  "Botswana",
+  "Bouvet Island",
+  "Brazil",
+  "British Indian Ocean Territory (the)",
+  "Brunei Darussalam",
+  "Bulgaria",
+  "Burkina Faso",
+  "Burundi",
+  "Cabo Verde",
+  "Cambodia",
+  "Cameroon",
+  "Canada",
+  "Cayman Islands (the)",
+  "Central African Republic (the)",
+  "Chad",
+  "Chile",
+  "China",
+  "Christmas Island",
+  "Cocos (Keeling) Islands (the)",
+  "Colombia",
+  "Comoros (the)",
+  "Congo (the Democratic Republic of the)",
+  "Congo (the)",
+  "Cook Islands (the)",
+  "Costa Rica",
+  "Croatia",
+  "Cuba",
+  "Curaçao",
+  "Cyprus",
+  "Czechia",
+  "Côte d'Ivoire",
+  "Denmark",
+  "Djibouti",
+  "Dominica",
+  "Dominican Republic (the)",
+  "Ecuador",
+  "Egypt",
+  "El Salvador",
+  "Equatorial Guinea",
+  "Eritrea",
+  "Estonia",
+  "Eswatini",
+  "Ethiopia",
+  "Falkland Islands (the) [Malvinas]",
+  "Faroe Islands (the)",
+  "Fiji",
+  "Finland",
+  "France",
+  "French Guiana",
+  "French Polynesia",
+  "French Southern Territories (the)",
+  "Gabon",
+  "Gambia (the)",
+  "Georgia",
+  "Germany",
+  "Ghana",
+  "Gibraltar",
+  "Greece",
+  "Greenland",
+  "Grenada",
+  "Guadeloupe",
+  "Guam",
+  "Guatemala",
+  "Guernsey",
+  "Guinea",
+  "Guinea-Bissau",
+  "Guyana",
+  "Haiti",
+  "Heard Island and McDonald Islands",
+  "Holy See (the)",
+  "Honduras",
+  "Hong Kong",
+  "Hungary",
+  "Iceland",
+  "India",
+  "Indonesia",
+  "Iran (Islamic Republic of)",
+  "Iraq",
+  "Ireland",
+  "Isle of Man",
+  "Israel",
+  "Italy",
+  "Jamaica",
+  "Japan",
+  "Jersey",
+  "Jordan",
+  "Kazakhstan",
+  "Kenya",
+  "Kiribati",
+  "Korea (the Democratic People's Republic of)",
+  "Korea (the Republic of)",
+  "Kuwait",
+  "Kyrgyzstan",
+  "Lao People's Democratic Republic (the)",
+  "Latvia",
+  "Lebanon",
+  "Lesotho",
+  "Liberia",
+  "Libya",
+  "Liechtenstein",
+  "Lithuania",
+  "Luxembourg",
+  "Macao",
+  "Madagascar",
+  "Malawi",
+  "Malaysia",
+  "Maldives",
+  "Mali",
+  "Malta",
+  "Marshall Islands (the)",
+  "Martinique",
+  "Mauritania",
+  "Mauritius",
+  "Mayotte",
+  "Mexico",
+  "Micronesia (Federated States of)",
+  "Moldova (the Republic of)",
+  "Monaco",
+  "Mongolia",
+  "Montenegro",
+  "Montserrat",
+  "Morocco",
+  "Mozambique",
+  "Myanmar",
+  "Namibia",
+  "Nauru",
+  "Nepal",
+  "Netherlands (the)",
+  "New Caledonia",
+  "New Zealand",
+  "Nicaragua",
+  "Niger (the)",
+  "Nigeria",
+  "Niue",
+  "Norfolk Island",
+  "Northern Mariana Islands (the)",
+  "Norway",
+  "Oman",
+  "Pakistan",
+  "Palau",
+  "Palestine, State of",
+  "Panama",
+  "Papua New Guinea",
+  "Paraguay",
+  "Peru",
+  "Philippines (the)",
+  "Pitcairn",
+  "Poland",
+  "Portugal",
+  "Puerto Rico",
+  "Qatar",
+  "Republic of North Macedonia",
+  "Romania",
+  "Russian Federation (the)",
+  "Rwanda",
+  "Réunion",
+  "Saint Barthélemy",
+  "Saint Helena, Ascension and Tristan da Cunha",
+  "Saint Kitts and Nevis",
+  "Saint Lucia",
+  "Saint Martin (French part)",
+  "Saint Pierre and Miquelon",
+  "Saint Vincent and the Grenadines",
+  "Samoa",
+  "San Marino",
+  "Sao Tome and Principe",
+  "Saudi Arabia",
+  "Senegal",
+  "Serbia",
+  "Seychelles",
+  "Sierra Leone",
+  "Singapore",
+  "Sint Maarten (Dutch part)",
+  "Slovakia",
+  "Slovenia",
+  "Solomon Islands",
+  "Somalia",
+  "South Africa",
+  "South Georgia and the South Sandwich Islands",
+  "South Sudan",
+  "Spain",
+  "Sri Lanka",
+  "Sudan (the)",
+  "Suriname",
+  "Svalbard and Jan Mayen",
+  "Sweden",
+  "Switzerland",
+  "Syrian Arab Republic",
+  "Taiwan (Province of China)",
+  "Tajikistan",
+  "Tanzania, United Republic of",
+  "Thailand",
+  "Timor-Leste",
+  "Togo",
+  "Tokelau",
+  "Tonga",
+  "Trinidad and Tobago",
+  "Tunisia",
+  "Turkey",
+  "Turkmenistan",
+  "Turks and Caicos Islands (the)",
+  "Tuvalu",
+  "Uganda",
+  "Ukraine",
+  "United Arab Emirates (the)",
+  "United Kingdom of Great Britain and Northern Ireland (the)",
+  "United States Minor Outlying Islands (the)",
+  "United States of America (the)",
+  "Uruguay",
+  "Uzbekistan",
+  "Vanuatu",
+  "Venezuela (Bolivarian Republic of)",
+  "Viet Nam",
+  "Virgin Islands (British)",
+  "Virgin Islands (U.S.)",
+  "Wallis and Futuna",
+  "Western Sahara",
+  "Yemen",
+  "Zambia",
+  "Zimbabwe"
+];;
+    var search = document.getElementById('search');
+     autocomplete(search, arr);
+</script>
+</div>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-36251023-1']);
+  _gaq.push(['_setDomainName', 'jqueryscript.net']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+<script>
+try {
+  fetch(new Request("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js", { method: 'HEAD', mode: 'no-cors' })).then(function(response) {
+    return true;
+  }).catch(function(e) {
+    var carbonScript = document.createElement("script");
+    carbonScript.src = "//cdn.carbonads.com/carbon.js?serve=CK7DKKQU&placement=wwwjqueryscriptnet";
+    carbonScript.id = "_carbonads_js";
+    document.getElementById("carbon-block").appendChild(carbonScript);
+  });
+} catch (error) {
+  console.log(error);
+}
+</script>
+    </body>
+</html>

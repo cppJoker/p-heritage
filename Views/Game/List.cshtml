@@ -1,0 +1,292 @@
+﻿@using System.Text
+@model Projet_Heritage.ViewModel.GameListViewModel
+@{
+    ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    List<SelectListItem> listItems = new List<SelectListItem>
+    {   new SelectListItem
+        {
+            Text = "Tout les groupes",
+            Value = "0",
+            Selected = true
+        },
+        new SelectListItem
+        {
+            Text = "Groupe 31",
+            Value = "31"
+        },
+        new SelectListItem
+        {
+            Text = "Groupe 32",
+            Value = "32",
+        },
+        new SelectListItem
+        {
+            Text = "Groupe 33",
+            Value = "33"
+        },
+        new SelectListItem
+        {
+            Text = "Groupe 34",
+            Value = "34"
+        }
+    };
+    List<SelectListItem> yearContent = new List<SelectListItem>
+    {
+        new SelectListItem
+        {
+            Text = "Secondaire 4 et 5",
+            Value = "0",
+            Selected = true
+        },
+        new SelectListItem
+        {
+            Text = "Secondaire 4",
+            Value = "1"
+        },
+        new SelectListItem
+        {
+            Text = "Secondaire 5",
+            Value = "2",
+        }
+    };
+    List<SelectListItem> ModulesContent = new List<SelectListItem>
+    {
+        new SelectListItem
+        {
+            Text = "Toutes les matières",
+            Value = "0",
+            Selected = true
+        },
+        new SelectListItem
+        {
+            Text = "Français",
+            Value = "1"
+        },
+        new SelectListItem
+        {
+            Text = "Mathématiques",
+            Value = "2"
+        }
+        ,
+        new SelectListItem
+        {
+            Text = "Physique",
+            Value = "3"
+        }
+        ,
+        new SelectListItem
+        {
+            Text = "Chimie",
+            Value = "4"
+        }
+        ,
+        new SelectListItem
+        {
+            Text = "English Language Arts",
+            Value = "5"
+        }
+        ,
+        new SelectListItem
+        {
+            Text = "Monde contemporin",
+            Value = "6"
+        }
+        ,
+        new SelectListItem
+        {
+            Text = "Éducation financière",
+            Value = "7"
+        }
+
+    };
+}
+
+<br/>
+
+
+
+@using (Html.BeginForm("List", "Game", FormMethod.Post, new
+{
+}))
+    {
+        <div class="research-bg">
+            <div class="form-row align-items-center">
+                <div class="col-sm-3 my-1">
+                    @Html.Label("Matières")
+                    @Html.DropDownListFor(m => m.ModuleCont, ModulesContent, new
+                    {
+                        @class = "form-control"
+                    })
+                </div>
+                <div class="col-sm-3 my-1">
+                    @Html.Label("Année cible")
+                    @Html.DropDownListFor(m => m.YearCont, yearContent, new
+                    {
+                        @class = "form-control"
+                    })
+                </div>
+                <div class="col-sm-3 my-1">
+                    @Html.Label("Groupe")
+                    @Html.DropDownListFor(m => m.Group, listItems, new
+                    {
+                        @class = "form-control"
+                    })
+                </div>
+                <div class="col-sm-3 my-1">
+                    @Html.Label("Recherche par titre")
+                    @Html.TextBoxFor(m => m.Research, new
+                    {
+                        @class = "form-control",
+                        placeholder = ""
+                    })
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="submit" id="submitBtn" class="btn btn-primary float-right">Recherche</button>
+            </div>
+        </div>
+        
+        
+    }
+
+<style>
+    .read-further {
+        color: #007bff;
+    }
+    .read-further:hover, .read-further:active {
+        text-decoration: underline;
+    }
+    .box {
+        width: 550px;
+        height: 450px;
+        cursor: pointer;
+        box-sizing: border-box;
+        box-shadow: 5px 5px 38px -12px rgba(86,86,86,0.95);
+        transition: box-shadow 0.2s ease-in-out;
+    }
+    .box:hover {
+        box-shadow: 5px 5px 38px 12px rgba(86,86,86,0.95);
+        transition: box-shadow 0.2s ease-in-out;
+    }
+</style>
+
+<div class="row" style="margin: auto">
+    @if (Model.Games.Count == 0)
+    {
+        <p>Aucun jeu.</p>
+    }
+    @foreach (var game in Model.Games)
+    {
+        <div class="col-md-12 m-md-auto col-lg-6 d-flex flex-wrap align-self-stretch">
+            <div class="card m-2 box" data-id=@game.Id style="width: 100%">
+                <div class="row no-gutters">
+                    <div class="col-sm-4">
+                        <img class="card-img"  style="height: 165px; width: 165px; margin: 10px;" src="@Url.Content(game.imagePath)" alt="Image">
+                        @{
+                            var moduleList = game.Modules.Split(',');
+                            foreach (var course in moduleList)
+                            {
+                                var favicon = "";
+                                if (course.Trim() == "Français")
+                                {
+                                    favicon = "<i style=\"color: rgb(255, 134, 0);\" class=\"fas fa-pencil-alt\"></i>";
+                                }
+                                if (course.Trim() == "Mathématiques")
+                                {
+                                    favicon = "<i style=\"color: rgb(252, 78, 49);\" class=\"fas fa-square-root-alt\"></i>";
+                                }
+                                if (course.Trim() == "Chimie")
+                                {
+                                    favicon = "<i style=\"color: rgb(102, 194, 255);\" class=\"fas fa-atom\"></i>&nbsp;";
+                                }
+                                if (course.Trim() == "Physique")
+                                {
+                                    favicon = "<i style=\"color: rgb(113, 205, 101);\" class=\"fas fa-tachometer-alt\"></i>";
+                                }
+                                if (course.Trim() == "ELA")
+                                {
+                                    favicon = "<i style=\"color: rgb(255, 203, 77);\" class=\"fas fa-flag-usa\"></i>&nbsp;";
+                                }
+                                if (course.Trim() == "Monde contemporin")
+                                {
+                                    favicon = "<i style=\"color: #0073cf\" class=\"fas fa-globe-americas\"></i>&nbsp;";
+                                }
+                                if (course.Trim() == "Éducation financière")
+                                {
+                                    favicon = "<i style=\"color: rgb(204, 51, 153);\" class=\"fas fa-money-check-alt\"></i>";
+                                }
+                                WriteLiteral("<h6 class=\"my-3\" style=\"margin-left:16px\">"+ favicon + " " + course + "</h6>");
+                            }
+                        }
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title" style="margin-bottom: 0;">@game.Name</h5>
+                            <br />
+                            <p class="card-text" style="">
+                                @{
+                                    var maxLen = 520 - 12;
+                                    if (game.Description.Length > maxLen)
+                                    {
+                                        var validPart = game.Description.Substring(0, maxLen);
+                                        validPart = validPart.Remove(validPart.LastIndexOf(' ', validPart.Length - 1));
+                                        var newDescription = new StringBuilder(validPart);
+                                        newDescription.Append("... ");
+                                        newDescription.Append("<span class=\"read-further\"> lire la suite!</span>");
+                                        WriteLiteral(new HtmlString(newDescription.ToString()));
+                                    }
+                                    else
+                                    {
+                                        WriteLiteral(new HtmlString(game.Description));
+                                    }
+
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+</div>
+<button id="btnTop" class="btn btn-outline-info" style="display: none; position: fixed; right: 39px; bottom: 52px;" title="Aller en haut"><i class="fas fa-chevron-up"></i></button>
+@section scripts{
+    <script>
+
+        $(document).ready(function() {
+            var mybutton = $("#btnTop");
+            if ($(window).width() < 990) {
+                $(".card-img").css({ "width": "200px", "height": "200px" });
+            } else {
+                $(".card-img").css({ "width": "165px" , "height": "165px" });
+            }
+            $(window).on("scroll",
+                function() {
+                    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                        mybutton.fadeIn(500);
+                    } else {
+                        mybutton.fadeOut(250);
+                    }
+                });
+            $(window).resize(function() {
+                if ($(window).width() < 990) {
+                    $(".card-img").css({ "width": "185px", "height": "185px" });
+                } else {
+                    $(".card-img").css({ "width": "165px" , "height": "165px" });
+                }
+            });
+            $("div.card").on("click",
+                function(e) {
+                    window.location.href = "/Game?id=" + $(this).attr("data-id");
+                });
+            $("#btnTop").on("click",
+                function() {
+                    $("html, body").animate({ scrollTop: 0 }, "fast");
+                });
+        });
+    </script>
+}

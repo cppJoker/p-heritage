@@ -1,0 +1,299 @@
+﻿@model IEnumerable<Projet_Heritage.ViewModel.KeyGameViewModel>
+@{
+    ViewBag.Title = "KeyList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="modal fade" id="createKeyModal" tabindex="-1" role="dialog" aria-labelledby="createKeyModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Ajouter des codes</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="keyAmount">Nombre personalisé:</label>
+                <input type="text" class="form-control" id="keyAmount" placeholder="Nombre # de codes">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                <button type="button" id="createCustomCount" data-dismiss="modal" class="btn btn-primary">Créer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="waitPleaseModal" tabindex="-1" data-backdrop="static" role="dialog" data-keyboard="false" aria-labelledby="waitPleaseModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Chargement en cours...</h5>
+            </div>
+            <div class="modal-body">
+                <label>Veuillez ne pas quitter cette page.<br>La plateforme est entrain de recevoir votre demande.</label>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="table-bg">
+    <h2>Codes d'équipe</h2>
+    <p class="font-weight-normal">Actions:</p>
+    <div class="row">
+        <div id="btnGenDropdown" class="btn-group align-self-end mt-auto m-2">
+            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Créer des codes
+            </button>
+            <div class="dropdown-menu">
+                <a value="1" class="dropdown-item" type="button" href="">Générer 1x</a>
+                <a value="10" class="dropdown-item" type="button" href="">Générer 10x</a>
+                <a value="20" class="dropdown-item" type="button" href="">Générer 20x</a>
+                <a value="50" class="dropdown-item" type="button" href="">Générer 50x</a>
+                <div class="dropdown-divider"></div>
+                <a value="0" class="dropdown-item" data-toggle="modal" data-target="#createKeyModal" href="">Autre</a>
+            </div>
+        </div>
+        <div id="btnDelDropdown" class="btn-group align-self-end mt-auto m-2">
+            <button type="button" class="btn btn-outline-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Supprimer des codes
+            </button>
+            <div class="dropdown-menu">
+                <a value="nonActive" class="dropdown-item" href="">Non-activé</a>
+                <div class="dropdown-divider"></div>
+                <a value="all" class="dropdown-item" href="">Tout</a>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <table id="keyTable" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Codes</th>
+                <th>Activé?</th>
+                <th>Peut modifié?</th>
+                <th>Jeu assigné</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pair in Model)
+            {
+                <tr>
+                    <td>@pair.Key.Key</td>
+                    <td>@(pair.Key.Activated ? "Oui" : "Non")</td>
+                    <td>@(pair.Key.CanEdit ? "Oui" : "Non")</td>
+                    <td>
+                        @if (pair.Key.Activated)
+                        {
+                            <a href="/Game?id=@pair.Game.Id">@pair.Game.Name (Groupe @pair.Game.Group)</a>
+                        }
+                        else
+                        {
+                            @Html.Raw("")
+                        }
+                    </td>
+                    <td>
+                        <button data-customer-id="@pair.Key.Id" class="btn btn-sm btn-danger js-delete">Supprimer</button>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+    <hr style="margin-bottom: 5px" />
+    <a style="font-size: 12px; color: dimgray" href="mailto: mohamedanis.laghrour@("@")protic.net">&#169; 2021 M. A. Laghrour</a>
+</div>
+    @section scripts
+{
+        <script>
+            (function ($) {
+                $.fn.inputFilter = function (inputFilter) {
+                    return this.on("input keydown keyup mousedown mouseup select contextmenu drop",
+                        function () {
+                            if (inputFilter(this.value)) {
+                                this.oldValue = this.value;
+                                this.oldSelectionStart = this.selectionStart;
+                                this.oldSelectionEnd = this.selectionEnd;
+                            } else if (this.hasOwnProperty("oldValue")) {
+                                this.value = this.oldValue;
+                                this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                            } else {
+                                this.value = "";
+                            }
+                        });
+                };
+            }(jQuery));
+            $(document).ready(function () {
+                $("#codeListNavItem").addClass("active font-weight-bold");
+                $("#keyAmount").inputFilter(function (value) {
+                    return /^\d*$/.test(value); // Allow digits only, using a RegExp
+                });
+
+                var table = $('#keyTable').DataTable({
+                    "language": {
+                        "lengthMenu": "Montrer _MENU_  codes par page",
+                        "zeroRecords": "Aucun code trouvé",
+                        "info": "Page _PAGE_ de _PAGES_",
+                        "infoEmpty": "Aucun code disponible",
+                        "infoFiltered": "(filtré de _MAX_ jeux)",
+                        "search": "Rechercher:",
+                        "paginate": {
+                            "first": "Premier",
+                            "last": "Dernier",
+                            "next": "Suivant",
+                            "previous": "Précédent"
+                        },
+                        "loadingRecords": "Chargement des codes...",
+                        "processing": "Chargement des codes...",
+                        "aria": {
+                            "sortAscending": ": Activer pour un filtrage ascendant",
+                            "sortDescending": ": Activer pour un filtrage descendant"
+                        }
+                    }
+                });
+                $("#keyTable").on("click",
+                    ".js-delete",
+                    function (e) {
+                        e.preventDefault();
+                        var button = $(this);
+                        bootbox.confirm({
+                            message: "Êtes-vous sûr de vouloir supprimer cette clé?<br>Si un jeu est assigné a elle, il sera aussi suprimmé.",
+                            buttons: {
+                                confirm: {
+                                    label: 'Oui',
+                                    className: 'btn btn-sm btn-warning'
+                                },
+                                cancel: {
+                                    label: 'Non',
+                                    className: 'btn btn-sm btn-secondary'
+                                }
+                            },
+                            callback: function (result) {
+                                if (result) {
+                                    $.ajax({
+                                        url: "/api/global/key/" + button.attr("data-customer-id"),
+                                        method: "DELETE",
+                                        success: function () {
+                                            table.row(button.parents("tr")).remove().draw();
+                                            $("#loading").remove();
+                                            history.pushState(null, null, window.location.href.split('#')[0]);
+                                            location.reload();
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    });
+
+                $("#btnGenDropdown").on("click",
+                    ".dropdown-item",
+                    function (e) {
+                        e.preventDefault();
+                        var count = parseInt($(this).attr("value"));
+                        if (count !== 0) {
+                            jQuery.noConflict();
+                            $('#waitPleaseModal').modal('show');
+                            $.ajax({
+                                url: "../api/global/key/" + count,
+                                method: "POST",
+                                success: function () {
+                                    $('#waitPleaseModal').modal('hide');
+                                    history.pushState(null, null, window.location.href.split('#')[0]);
+                                    $("#loading").remove();
+                                    location.reload();
+                                }
+                            });
+                        }
+                    });
+                $("#btnDelDropdown").on("click",
+                    ".dropdown-item",
+                    function (e) {
+                        e.preventDefault();
+                        var type = $(this).attr("value");
+                        if (type === "nonActive") {
+                            bootbox.confirm({
+                                message: "Êtes-vous sûr de vouloir supprimer toutes les clés non-actives?",
+                                buttons: {
+                                    confirm: {
+                                        label: 'Oui',
+                                        className: 'btn btn-sm btn-warning'
+                                    },
+                                    cancel: {
+                                        label: 'Non',
+                                        className: 'btn btn-sm btn-secondary'
+                                    }
+                                },
+                                callback: function (result) {
+                                    if (result) {
+                                        jQuery.noConflict();
+                                        $('#waitPleaseModal').modal('show');
+                                        $.ajax({
+                                            url: "/api/global/key/" + -1,
+                                            method: "DELETE",
+                                            success: function () {
+                                                $('#waitPleaseModal').modal('hide');
+                                                history.pushState(null, null, window.location.href.split('#')[0]);
+                                                $("#loading").remove();
+                                                location.reload();
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        } else if (type === "all") {
+                            bootbox.confirm({
+                                message: "Êtes-vous sûr de vouloir supprimer toutes les clés?",
+                                buttons: {
+                                    confirm: {
+                                        label: 'Oui',
+                                        className: 'btn btn-sm btn-warning'
+                                    },
+                                    cancel: {
+                                        label: 'Non',
+                                        className: 'btn btn-sm btn-secondary'
+                                    }
+                                },
+                                callback: function (result) {
+                                    if (result) {
+                                        console.log("ok");
+                                        jQuery.noConflict();
+                                        $('#waitPleaseModal').modal('show');
+                                        $.ajax({
+                                            url: "/api/global/key/" + -2,
+                                            method: "DELETE",
+                                            success: function () {
+                                                $('#waitPleaseModal').modal('hide');
+                                                $("#loading").remove();
+                                                history.pushState(null, null, window.location.href.split('#')[0]);
+                                                location.reload();
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
+                $("#createCustomCount").on("click",
+                    function (e) {
+                        e.preventDefault();
+                        var count = parseInt($("#keyAmount").val());
+                        if (count !== 0) {
+                            jQuery.noConflict();
+                            $('#waitPleaseModal').modal('show');
+                            $.ajax({
+                                url: "../api/global/key/" + count,
+                                method: "POST",
+                                success: function () {
+                                    $('#waitPleaseModal').modal('hide');
+                                    history.pushState(null, null, window.location.href.split('#')[0]);
+                                    $("#loading").remove();
+                                    location.reload();
+                                }
+                            });
+                        }
+                    });
+
+            });
+        </script>
+    }
+

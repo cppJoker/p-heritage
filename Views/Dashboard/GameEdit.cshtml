@@ -1,0 +1,365 @@
+﻿@model Projet_Heritage.ViewModel.GameFormViewModel
+@{
+    ViewBag.Title = "GameEdit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@{
+    List<SelectListItem> listItems = new List<SelectListItem>
+{
+        new SelectListItem
+        {
+            Text = "Groupe 31",
+            Value = "31"
+        },
+        new SelectListItem
+        {
+            Text = "Groupe 32",
+            Value = "32",
+        },
+        new SelectListItem
+        {
+            Text = "Groupe 33",
+            Value = "33"
+        },
+        new SelectListItem
+        {
+            Text = "Groupe 34",
+            Value = "34"
+        }
+    };
+    List<SelectListItem> yearContent = new List<SelectListItem>
+{
+        new SelectListItem
+        {
+            Text = "Secondaire 4",
+            Value = "Secondaire 4"
+        },
+        new SelectListItem
+        {
+            Text = "Secondaire 5",
+            Value = "Secondaire 5",
+        },
+        new SelectListItem
+        {
+            Text = "Secondaire 4 et 5",
+            Value = "Secondaire 4 et 5"
+        }
+    };
+}
+
+<div class="modal fade" id="waitPleaseModal" tabindex="-1" data-backdrop="static" role="dialog" data-keyboard="false" aria-labelledby="waitPleaseModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Chargement en cours...</h5>
+            </div>
+            <div class="modal-body">
+                <label>Veuillez ne pas quitter cette page.<br>La plateforme est entrain de recevoir votre soumission.<br><br>Le temps de chargement dépend de la taille des fichiers.</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="justify-content: center; align-items: center; display: flex; width: 600px; margin: auto;">
+    <div class="table-bg" style="margin-top: 15px; justify-content: center; align-items: center; display: flex;">
+        <div class="col-md-12">
+            <h2 style="margin-bottom: 20px">Modifier un jeu</h2>
+            <div id="errAlert" class="alert alert-danger alert-dismissible fade show col-md-12" style="@(Model.HasError?Html.Raw("display: inherit;"):Html.Raw("display: none;"))" role="alert">
+                <strong>Attention!</strong>
+                <br>
+                Veuillez verifier que les champs sont bien remplis:
+                <br>
+                <span id="errMessage">@Model.ErrorString</span>
+            </div>
+            @using (Html.BeginForm("EditGame", "Dashboard", FormMethod.Post, new { enctype = "multipart/form-data", style = "margin: auto;" }))
+            {
+                @Html.ValidationSummary(true, "Veuillez remplir les champs manquants")
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Key)
+                    @Html.TextBoxFor(m => m.Key, new
+                    {
+                        @class = "form-control col-md-2",
+                        @readonly = true
+                    })
+
+                </div>
+                <br />
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Game.Name)
+                    @Html.TextBoxFor(m => m.Game.Name, new
+                    {
+                        @class = "form-control col-md-12"
+                    })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Game.Description)
+                    @Html.TextAreaFor(m => m.Game.Description, new
+                    {
+                        @class = "form-control col-md-12",
+                        style = "height:130px;"
+                    })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Game.TeamMembers)
+                    @Html.TextBoxFor(m => m.Game.TeamMembers, new
+                    {
+                        @class = "form-control col-md-12",
+                        placeholder = "Jules Grand, Lise Lebrun, Sam Doe, Max Simard"
+                    })
+                </div>
+                <br />
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Game.Theme)
+                    @Html.TextBoxFor(m => m.Game.Theme, new
+                    {
+                        @class = "form-control col-md-12",
+                        placeholder = ""
+                    })
+                </div>
+                <div class="form-group">
+                    @Html.Label("Matière")
+                    <div class="list-group col-md-12">
+                        <label class="list-group-item ">
+                            <div class="form-check">
+                                <input class="form-check-input module-check" type="checkbox" value="Français" @(Model.Game.Modules.Contains("Français")?"checked":"")>
+                                <label class="form-check-label" for="defaultCheck1">
+                                    Français
+                                </label>
+                            </div>
+                        </label>
+                        <label class="list-group-item">
+                            <div class="form-check">
+                                <input class="form-check-input module-check" type="checkbox" value="Mathématiques" @(Model.Game.Modules.Contains("Mathématiques")?"checked":"")>
+                                <label class="form-check-label" for="defaultCheck1">
+                                    Mathématiques
+                                </label>
+                            </div>
+                        </label>
+                        <label class="list-group-item">
+                            <div class="form-check">
+                                <input class="form-check-input module-check" type="checkbox" value="Physique" @(Model.Game.Modules.Contains("Physique")?"checked":"")>
+                                <label class="form-check-label" for="defaultCheck1">
+                                    Physique
+                                </label>
+                            </div>
+                        </label>
+                        <label class="list-group-item">
+                            <div class="form-check">
+                                <input class="form-check-input module-check" type="checkbox" value="Chimie" @(Model.Game.Modules.Contains("Chimie")?"checked":"")>
+                                <label class="form-check-label">
+                                    Chimie
+                                </label>
+                            </div>
+                        </label>
+                        <label class="list-group-item">
+                            <div class="form-check">
+                                <input class="form-check-input module-check" type="checkbox" value="ELA" @(Model.Game.Modules.Contains("ELA")?"checked":"")>
+                                <label class="form-check-label">
+                                    English Language Arts
+                                </label>
+                            </div>
+                        </label>
+                        <label class="list-group-item">
+                            <div class="form-check">
+                                <input class="form-check-input module-check" type="checkbox" value="Monde contemporin" @(Model.Game.Modules.Contains("Monde contemporin")?"checked":"")>
+                                <label class="form-check-label">
+                                    Monde contemporin
+                                </label>
+                            </div>
+                        </label>
+                        <label class="list-group-item">
+                            <div class="form-check">
+                                <input class="form-check-input module-check" type="checkbox" value="Éducation financière" @(Model.Game.Modules.Contains("Éducation financière")?"checked":"")>
+                                <label class="form-check-label">
+                                    Éducation financière
+                                </label>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Game.Group)
+                    @Html.DropDownListFor(m => m.Game.Group, listItems, "", new
+                    {
+                        @class = "form-control col-md-12"
+                    })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Game.yearContent)
+                    @Html.DropDownListFor(m => m.Game.yearContent, yearContent, "", new
+                    {
+                        @class = "form-control col-md-12"
+                    })
+                </div>
+                <br />
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Game.Link)
+                    @Html.TextBoxFor(m => m.Game.Link, new
+                    {
+                        @class = "form-control col-md-12"
+                    })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Game.SolutionLink)
+                    @Html.TextBoxFor(m => m.Game.SolutionLink, new
+                    {
+                        @class = "form-control col-md-12"
+                    })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Game.FormLink)
+                    @Html.TextBoxFor(m => m.Game.FormLink, new
+                    {
+                        @class = "form-control col-md-12"
+                    })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Game.GuideLink)
+                    @Html.TextBoxFor(m => m.Game.GuideLink, new
+                    {
+                        @class = "form-control col-md-12"
+                    })
+                </div>
+                <br />
+                <div class="form-group">
+                    @Html.Label("Soumettre les images (jpg ou png) (optionnel)")
+                    <br>
+                    <label class="btn btn-sm btn-outline-info form-control col-md-12">
+                        <i class="fa fa-image"></i><span id="vignette">&nbsp;Soumettre une nouvelle vignette (450px * 450px)</span><input id="vign" type="file" style="display: none;" name="File" required>
+                    </label>
+                    <label class="btn btn-sm btn-outline-info form-control col-md-12">
+                        <i class="fa fa-image"></i><span id="affiche">&nbsp;Soumettre une nouvelle affiche (1600px * 1000px)</span><input id="affi" type="file" style="display: none;" name="BigFile" required>
+                    </label>
+                </div>
+                <div class="form-group">
+                    @Html.Label("Soumettre le fichier zip (optionnel)")
+                    <br>
+                    <label class="btn btn-sm btn-outline-dark form-control col-md-12">
+                        <i class="far fa-file-archive"></i><span id="ressource">&nbsp;Soumettre un nouveau fichier</span><input id="ress" type="file" style="display: none;" name="ResourceFile" required>
+                    </label>
+
+                </div>
+                @Html.HiddenFor(m => m.Game.Modules)
+                @Html.HiddenFor(m => m.Game.Id)
+                @Html.HiddenFor(m=> m.Game.DatePublished)
+                @Html.AntiForgeryToken()
+                <button type="submit" id="submitBtn" class="btn btn-warning" style="width: 25%">Modifier</button>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        var _validFileExtensions = [".jpg", ".jpeg", ".png"];
+        var _validResExtensions = [".zip"];
+        function isAlphanumeric(str) {
+            return /^[0-9a-zA-Z_\-\s]+$/.test(str);
+        }
+        $(document).ready(function () {
+            $("#submitBtn").on("click", function (e) {
+                console.log('clicked');
+                jQuery.noConflict();
+                $('#waitPleaseModal').modal('toggle');
+                setTimeout(function() {
+                        if ($('.input-validation-error')[0]) {
+                            $('#waitPleaseModal').modal('hide');
+                        }
+                    },
+                    500);
+            });
+            $("#vign").change(function () {
+                var filename = $(this).val();
+                filename = filename.replace("C:\\fakepath\\", "");
+                if (filename.length > 0) {
+                    var blnValid = false;
+                    for (var j = 0; j < _validFileExtensions.length; j++) {
+                        var sCurExtension = _validFileExtensions[j];
+                        if (filename.substr(filename.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+                            blnValid = true;
+                            if (!isAlphanumeric(filename.replace(filename.substr(filename.length - sCurExtension.length, sCurExtension.length), '')))
+                                blnValid = false;
+                            break;
+                        }
+                    }
+                    if (!blnValid) {
+                        $(this).val("");
+                        $("#vignette").text(" Soumettre une nouvelle vignette (450px * 450px)");
+                        $("#errAlert").css({ "display": "inherit" });
+                        $("#errMessage").text("La vignette est invalide ou contient des caractères spéciaux.");
+                        $("html, body").animate({ scrollTop: 0 }, "slow");
+                    } else {
+                        $("#vignette").text(" " + filename);
+                        $("#errAlert").css({ "display": "none" });
+                    }
+                }
+            });
+            $("#affi").change(function () {
+                var filename = $(this).val();
+                filename = filename.replace("C:\\fakepath\\", "");
+                if (filename.length > 0) {
+                    var blnValid = false;
+                    for (var j = 0; j < _validFileExtensions.length; j++) {
+                        var sCurExtension = _validFileExtensions[j];
+                        if (filename.substr(filename.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+                            blnValid = true;
+                            if (!isAlphanumeric(filename.replace(filename.substr(filename.length - sCurExtension.length, sCurExtension.length), '')))
+                                blnValid = false;
+                            break;
+                        }
+                    }
+                    if (!blnValid) {
+                        $(this).val("");
+                        $("#affiche").text(" Soumettre une nouvelle affiche (1600px * 1000px)");
+                        $("#errAlert").css({ "display": "inherit" });
+                        $("#errMessage").text("L'affiche est invalide ou contient des caractères spéciaux.");
+                        $("html, body").animate({ scrollTop: 0 }, "slow");
+                    } else {
+                        $("#affiche").text(" " + filename);
+                        $("#errAlert").css({ "display": "none" });
+                    }
+                }
+            });
+            $("#ress").change(function () {
+                var filename = $(this).val();
+                filename = filename.replace("C:\\fakepath\\", "");
+                if (filename.length > 0) {
+                    var blnValid = false;
+                    for (var j = 0; j < _validResExtensions.length; j++) {
+                        var sCurExtension = _validResExtensions[j];
+                        if (filename.substr(filename.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+                            blnValid = true;
+                            if (!isAlphanumeric(filename.replace(filename.substr(filename.length - sCurExtension.length, sCurExtension.length), '')))
+                                blnValid = false;
+                            break;
+                        }
+                    }
+                    if (!blnValid) {
+                        $(this).val("");
+                        $("#ressource").text(" Soumettre un nouveau fichier");
+                        $("#errAlert").css({ "display": "inherit" });
+                        $("#errMessage").text("Le fichier n'est pas un zip ou contient des caractères spéciaux.");
+                        $("html, body").animate({ scrollTop: 0 }, "slow");
+                    } else {
+                        $("#ressource").text(" " + filename);
+                        $("#errAlert").css({ "display": "none" });
+                    }
+                }
+            });
+            $("input.module-check:checkbox").change(function () {
+                var prop = document.getElementById('Game_Modules');
+                prop.value = "";
+                $("input.module-check:checkbox:checked").each(function() {
+                    prop.value = prop.value + this.value + ", ";
+                });
+            });
+        });
+    </script>
+
+
+    @Scripts.Render("~/bundles/jqueryval")
+}

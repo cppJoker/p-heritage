@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="LocalDB-Web.config Connection String" description="LocalDB Connection String used in web.config by the application to access the database." defaultValue="Data Source=(LocalDb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\aspnet-Projet Heritage-20210403072627.mdf;Initial Catalog=aspnet-Projet Heritage-20210403072627;Integrated Security=True" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="E:\\Projects\\Projet\ Heritage\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='LocalDB']/@connectionString" />
+  </parameter>
+  <parameter name="TestDB-Web.config Connection String" description="TestDB Connection String used in web.config by the application to access the database." defaultValue="Data Source=SQL5104.site4now.net;Initial Catalog=DB_A7205A_testenv;User Id=db_a7205a_testenv_admin;Password=Anisanis04*" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="E:\\Projects\\Projet\ Heritage\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='TestDB']/@connectionString" />
+  </parameter>
+  <parameter name="ProductionDB-Web.config Connection String" description="ProductionDB Connection String used in web.config by the application to access the database." defaultValue="Data Source=SQL5103.site4now.net;Initial Catalog=DB_A7205A_proticdev;User Id=DB_A7205A_proticdev_admin;Password=Anisanis04*" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="E:\\Projects\\Projet\ Heritage\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='ProductionDB']/@connectionString" />
+  </parameter>
+</parameters>

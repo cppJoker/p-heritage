@@ -1,0 +1,114 @@
+﻿@model Projet_Heritage.Models.PlatformSetting
+@{
+    ViewBag.Title = "Settings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="modal fade" id="waitPleaseModal" tabindex="-1" data-backdrop="static" role="dialog" data-keyboard="false" aria-labelledby="waitPleaseModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Chargement en cours...</h5>
+            </div>
+            <div class="modal-body">
+                <label>Veuillez ne pas quitter cette page.<br>La plateforme est entrain de recevoir votre demande.</label>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="table-bg">
+    <h2>Paramètres</h2>
+    <hr />
+    @using (Html.BeginForm("SaveSettings", "Dashboard", FormMethod.Post, new { style = "margin: auto;" }))
+    {
+        @Html.ValidationSummary(true, "Veuillez remplir les champs manquants")
+        <div class="form-group">
+
+        </div>
+        <div class="form-row">
+            <div class="col-9">
+                @Html.LabelFor(m => m.MainTitle)
+                @Html.TextBoxFor(m => m.MainTitle, new
+                {
+                    @class = "form-control col-md-12"
+                })
+            </div>
+            <div class="col">
+                <label for="MainTitleIcon"><a href="https://fontawesome.com/icons?d=gallery&p=2&m=free" target="_blank">Icône de la page d'accueil</a></label>
+                @Html.TextBoxFor(m => m.MainTitleIcon, new
+                {
+                    @class = "form-control"
+                })
+            </div>
+        </div>
+        <br />
+        <div class="form-group">
+            @Html.LabelFor(m => m.MainSubTitle)
+            @Html.TextBoxFor(m => m.MainSubTitle, new
+            {
+                @class = "form-control col-md-12"
+            })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.MainDescription)
+            <div id="editor" class="form-control" spellcheck="false">
+                @{
+                    WriteLiteral(new HtmlString(HttpUtility.HtmlDecode(Model.MainDescription)));
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.HandInDateTime)
+            <input class="form-control" type="datetime-local" id="meeting-time"
+                   name="meeting-time" value="@Model.HandInDateTime.ToString("yyyy-MM-dd HH:mm:ss").Replace(' ', 'T')"
+                   min="2020-01-01T00:00">
+        </div>
+        <br />
+        @Html.HiddenFor(m => m.HandInDateTime)
+        @Html.HiddenFor(m => m.Id)
+        @Html.HiddenFor(m => m.MainDescription)
+        @Html.HiddenFor(m => m.HandInDateTime)
+        @Html.AntiForgeryToken()
+
+        <button type="submit" id="submitBtn" class="btn btn-warning" style="width: 25%">Enregistrer</button>
+    }
+    <hr style="margin-bottom: 5px;" />
+    <a style="font-size: 12px; color: dimgray" href="mailto: mohamedanis.laghrour@("@")protic.net">&#169; 2021 M. A. Laghrour</a>
+</div>
+
+@section scripts
+{
+    <script>
+            $(document).ready(function () {
+                $("#SettingsNavItem").addClass("active font-weight-bold");
+                $("#submitBtn").on("click", function (e) {
+                    console.log('clicked');
+                    jQuery.noConflict();
+                    $('#waitPleaseModal').modal('toggle');
+                    setTimeout(function() {
+                            if ($('.input-validation-error')[0]) {
+                                $('#waitPleaseModal').modal('hide');
+                            }
+                        },
+                        500);
+                });
+                var quill = new Quill('#editor', {
+                    theme: 'snow'
+                });
+                var htmlText = $(".ql-editor").html();
+                document.getElementById('MainDescription').value = $("<div/>").text(htmlText).html();
+                $(".ql-editor").on('DOMSubtreeModified',function () {
+                    var htmlText2 = $(".ql-editor").html();
+                    document.getElementById('MainDescription').value = $("<div/>").text(htmlText2).html();
+                });
+                $('#meeting-time').on("change",
+                    function() {
+                        var date = $(this).val();
+                        var prop = document.getElementById('HandInDateTime');
+                        date = date.replace("-", "/").replace("-","/");
+                        date = date.replace("T", " ");
+                        date = date.concat(":00");
+                        prop.value = date;
+                    });
+            });
+    </script>
+}
