@@ -152,7 +152,8 @@ namespace Projet_Heritage.Controllers
                     var imagePath = Server.MapPath("/UploadedMedia/") + fileName + fileExtension;
                     viewModel.ResourceFile.SaveAs(imagePath);
                     viewModel.Game.resourcePath = imagePath.Replace(rootPath, "\\").Replace("\\", "/");
-                    System.IO.File.Delete(rootPath + gameInDb.resourcePath.Replace("~", "").Replace("/", "\\"));
+                    if(gameInDb.resourcePath != null) 
+                        System.IO.File.Delete(rootPath + gameInDb.resourcePath.Replace("~", "").Replace("/", "\\"));
                 }
                 if (viewModel.File != null)
                 {
@@ -167,7 +168,8 @@ namespace Projet_Heritage.Controllers
                     var imagePath = Server.MapPath("/UploadedMedia/") + fileName + fileExtension;
                     viewModel.File.SaveAs(imagePath);
                     viewModel.Game.imagePath = imagePath.Replace(rootPath, "\\").Replace("\\", "/");
-                    System.IO.File.Delete(rootPath + gameInDb.imagePath.Replace("~", "").Replace("/", "\\"));
+                    if (gameInDb.imagePath != null)
+                        System.IO.File.Delete(rootPath + gameInDb.imagePath.Replace("~", "").Replace("/", "\\"));
                 }
                 if (viewModel.BigFile != null)
                 {
@@ -182,7 +184,8 @@ namespace Projet_Heritage.Controllers
                     var imagePath = Server.MapPath("/UploadedMedia/") + fileName + fileExtension;
                     viewModel.BigFile.SaveAs(imagePath);
                     viewModel.Game.largeImagePath = imagePath.Replace(rootPath, "\\").Replace("\\", "/");
-                    System.IO.File.Delete(rootPath + gameInDb.largeImagePath.Replace("~", "").Replace("/", "\\"));
+                    if (gameInDb.largeImagePath != null)
+                        System.IO.File.Delete(rootPath + gameInDb.largeImagePath.Replace("~", "").Replace("/", "\\"));
                 }
 
                 gameInDb.Name = viewModel.Game.Name;
