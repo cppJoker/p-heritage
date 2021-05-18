@@ -33,7 +33,8 @@ namespace Projet_Heritage.Controllers
             {
                 Game = new Game
                 {
-                    DatePublished = DateTime.Now
+                    DatePublished = DateTime.Now,
+                    Stars = 5
                 },
             };
             return View(viewModel);
@@ -141,6 +142,21 @@ namespace Projet_Heritage.Controllers
                     yearText = "Secondaire 5";
                     break;
             }
+            games = games.Where(w => w.Stars != 0).ToList();
+            SortedSet<int> realYears = new SortedSet<int>();
+            foreach (var game in games)
+            {
+                realYears.Add(game.DatePublished.Year);
+            }
+            viewModel.RealizationList = realYears.OrderByDescending(x=>x).ToList();
+            if (viewModel.Realization == null)
+            {
+                viewModel.Realization = realYears.Last();
+            }
+            if (viewModel.Realization != 0)
+            {
+                games = games.Where(w => w.DatePublished.Year == viewModel.Realization).ToList();
+            }
             if (!string.IsNullOrEmpty(matiereText))
                 games = games.Where(w => w.Modules.Contains(matiereText)).ToList();
             if (yearText != "Secondaire 4 et 5")
@@ -149,6 +165,7 @@ namespace Projet_Heritage.Controllers
                 games = games.Where(w => w.Group.Equals(viewModel.Group)).ToList();
             if (!string.IsNullOrEmpty(viewModel.Research))
                 games = games.Where(w => w.Name.Contains(viewModel.Research)).ToList();
+            games = games.OrderByDescending(w => w.Stars).ToList();
             viewModel.Games = games;
             return View(viewModel);
 
@@ -246,6 +263,7 @@ namespace Projet_Heritage.Controllers
                 viewModel.Game.DatePublished = DateTime.Now;
                 string module = viewModel.Game.Modules;
                 viewModel.Game.Modules = module.Remove(module.Length - 2);
+                viewModel.Game.Stars = 5;
                 _context.Games.Add(viewModel.Game);
                 serialKey.GameID = viewModel.Game.Id;
 

@@ -66,42 +66,46 @@
         </div>
     </div>
     <!-- /.card -->
-    <div class="card card-outline-secondary my-4" style="box-shadow: 0px 5px 25px 17px rgba(0,0,0,0.15);">
+    <div class="card card-outline-secondary my-4 col-5 p-0" style="box-shadow: 0px 5px 25px 17px rgba(0,0,0,0.15);">
         <div class="card-header">
             Laisser un commentaire
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-12">
+                <div class="w-100">
                     @if (Model.HadError)
                     {
-                        <div class="alert alert-danger alert-dismissible fade show col-md-7" role="alert">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <strong>Attention!</strong><br>Votre code d'équipe n'est pas accepté: il doit etre valide et non-utilisé!
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                     }
-                    @using (Html.BeginForm("SendComment", "Game"))
+                    @using (Html.BeginForm("SendComment", "Game",FormMethod.Post, new
+                    {
+                        style="margin-left: 16px; margin-right: 16px"
+                    }))
                     {
                         <div class="form-group">
                             @Html.LabelFor(m => m.Key)
                             @Html.TextBoxFor(m => m.Key, new
-                            {
-                                @class = "form-control col-md-7"
-                            })
+                       {
+                           @class = "form-control col-3"
+                       })
 
                         </div>
                         <div class="form-group">
                             @Html.LabelFor(m => m.Comment.Content)
                             @Html.TextAreaFor(m => m.Comment.Content, new
-                            {
-                                @class = "form-control col-md-7"
-                            })
+                       {
+                           @class = "form-control col-12",
+                           style = "height:130px;"
+                       })
                         </div>
                         @Html.HiddenFor(m => m.Game.Id)
                         <div class="form-group">
-                            <button type="submit" class="btn col-md-7 btn-sm btn-outline-info form-control"><i class="fa fa-comment-alt"></i> Envoyer (non-modifiable après l'envoi)</button>
+                            <button type="submit" class="btn btn-sm btn-outline-info form-control"><i class="fa fa-comment-alt"></i> Envoyer (non-modifiable après l'envoi)</button>
                         </div>
 
                     }

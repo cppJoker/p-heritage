@@ -51,6 +51,7 @@ namespace Projet_Heritage.Models
         [Display(Name = "Lien vers le mode d'emploi (optionnel, doit commencer par https://)")]
         public string GuideLink { get; set; }
 
+        public int Stars { get; set; }
         
         public string imagePath { get; set; }
         public string largeImagePath { get; set; }

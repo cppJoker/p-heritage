@@ -33,7 +33,10 @@
             {
                 <tr>
                     <td>@pair.Review.Content</td>
-                    <td>@pair.Review.Published.ToString("yyyy/MM/dd")</td>
+                    @{
+                        DateTime published = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(pair.Review.Published, TimeZoneInfo.Local.Id, "Eastern Standard Time");
+                        <td>@published.ToString("yyyy/MM/dd")<br>@published.ToString("HH:mm")</td>
+                    }
                     <td>@pair.Review.Authors</td>
                     <td>
                         <a href="/Game?id=@pair.Game.Id">@pair.Game.Name</a>

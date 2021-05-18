@@ -62,6 +62,25 @@ namespace Projet_Heritage.Controllers.api
             return Ok(_context.SerialKeys.Where(c=>c.Activated == false).ToList().Count);
         }
 
+        [System.Web.Http.Route("api/global/game/editRating/{id}/{stars}")]
+        [System.Web.Http.HttpPut]
+        public IHttpActionResult EditRating(int id, int stars)
+        {
+            var game = _context.Games.SingleOrDefault(c => c.Id == id);
+            if (game != null)
+            {
+                if (stars >= 0 && stars <= 5)
+                {
+                    game.Stars = stars;
+                    _context.SaveChanges();
+                    return Ok();
+                }
+
+                return BadRequest();
+            }
+            return NotFound();
+        }
+
         [System.Web.Http.Route("api/global/key/{id}")]
         [System.Web.Http.HttpPost]
         public IHttpActionResult GenerateKey(int id)
@@ -75,7 +94,8 @@ namespace Projet_Heritage.Controllers.api
                     {
                         Key = randomKey,
                         Activated = false,
-                        GameID = null
+                        GameID = null,
+                        DateCreated = DateTime.Now
                     };
                     _context.SerialKeys.Add(key);
                 }
@@ -85,7 +105,8 @@ namespace Projet_Heritage.Controllers.api
                     {
                         Key = RandomString(5),
                         Activated = false,
-                        GameID = null
+                        GameID = null,
+                        DateCreated = DateTime.Now
                     };
                     _context.SerialKeys.Add(key);
                 }

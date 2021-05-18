@@ -1,9 +1,27 @@
-﻿@model IEnumerable<Projet_Heritage.ViewModel.KeyGameViewModel>
+﻿@model Projet_Heritage.ViewModel.KeyListViewModel
 @{
     ViewBag.Title = "KeyList";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+@{
+    List<SelectListItem> Realizations = new List<SelectListItem>();
+    foreach (var real in Model.RealizationList)
+    {
+        string text = "Projet intégrateur " + (real - 1) + " - " + real;
+        Realizations.Add(new SelectListItem()
+        {
+            Text = text,
+            Value = real.ToString(),
+            Selected = real == Model.Realization
+        });
+    }
+    Realizations.Add(new SelectListItem()
+    {
+        Text = "Toutes les années",
+        Value = "0",
+        Selected = Model.Realization == 0
+    });
+}
 <div class="modal fade" id="createKeyModal" tabindex="-1" role="dialog" aria-labelledby="createKeyModal" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -38,6 +56,13 @@
 </div>
 <div class="table-bg">
     <h2>Codes d'équipe</h2>
+    <span style="font-style: italic">
+        Un code d'équipe est une combinaison de 5 caractères alphanumériques identifiant chaque équipe.
+        Une fois qu'une équipe inscrit son jeu sur la plateforme, le code est maintenant attaché au jeu, et ne peut être détaché.
+        En supprimant un code déjà activé, le jeu assigné à ce code sera aussi supprimé.<br />Avec son code, une équipe peut donner un commentaire à une autre équipe.
+    </span>
+    <br />
+    <br />
     <p class="font-weight-normal">Actions:</p>
     <div class="row">
         <div id="btnGenDropdown" class="btn-group align-self-end mt-auto m-2">
@@ -65,27 +90,44 @@
         </div>
     </div>
     <hr />
+    @using (Html.BeginForm("Keys", "Dashboard", FormMethod.Post, new
+    {
+    }))
+    {
+        <div class="form-group d-flex justify-content-end" style="margin-top: 5px; margin-bottom: 0; width: 100%">
+            <div class="input-group float-left" id="realYearContainer">
+                <label class="input-group-text" style="border-bottom-right-radius: 0; border-top-right-radius: 0" for="inputGroupSelect01">Réalisation</label>
+                @Html.DropDownListFor(m => m.Realization, Realizations, new
+                {
+                    @class = "form-control",
+                    id = "inputGroupSelect01"
+                })
+                <button style="border-bottom-left-radius: 0; border-top-left-radius: 0" type="submit" id="submitBtn" class="btn btn-secondary float-left"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    }
+    <br>
     <table id="keyTable" class="table table-bordered table-hover">
         <thead>
             <tr>
                 <th>Codes</th>
                 <th>Activé?</th>
-                <th>Peut modifié?</th>
+                <th>Création</th>
                 <th>Jeu assigné</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var pair in Model)
+            @foreach (var pair in Model.keyGamePair)
             {
                 <tr>
                     <td>@pair.Key.Key</td>
                     <td>@(pair.Key.Activated ? "Oui" : "Non")</td>
-                    <td>@(pair.Key.CanEdit ? "Oui" : "Non")</td>
+                    <td>@pair.Key.DateCreated.ToString("yyyy/MM/dd")</td>
                     <td>
                         @if (pair.Key.Activated)
                         {
-                            <a href="/Game?id=@pair.Game.Id">@pair.Game.Name (Groupe @pair.Game.Group)</a>
+                            <a href="/Game?id=@pair.Value.Id">@pair.Value.Name (Groupe @pair.Value.Group)</a>
                         }
                         else
                         {
@@ -103,61 +145,116 @@
     <hr style="margin-bottom: 5px" />
     <a style="font-size: 12px; color: dimgray" href="mailto: mohamedanis.laghrour@("@")protic.net">&#169; 2021 M. A. Laghrour</a>
 </div>
-    @section scripts
+@section scripts
 {
-        <script>
-            (function ($) {
-                $.fn.inputFilter = function (inputFilter) {
-                    return this.on("input keydown keyup mousedown mouseup select contextmenu drop",
-                        function () {
-                            if (inputFilter(this.value)) {
-                                this.oldValue = this.value;
-                                this.oldSelectionStart = this.selectionStart;
-                                this.oldSelectionEnd = this.selectionEnd;
-                            } else if (this.hasOwnProperty("oldValue")) {
-                                this.value = this.oldValue;
-                                this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
-                            } else {
-                                this.value = "";
+    <script>
+        (function ($) {
+            $.fn.inputFilter = function (inputFilter) {
+                return this.on("input keydown keyup mousedown mouseup select contextmenu drop",
+                    function () {
+                        if (inputFilter(this.value)) {
+                            this.oldValue = this.value;
+                            this.oldSelectionStart = this.selectionStart;
+                            this.oldSelectionEnd = this.selectionEnd;
+                        } else if (this.hasOwnProperty("oldValue")) {
+                            this.value = this.oldValue;
+                            this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                        } else {
+                            this.value = "";
+                        }
+                    });
+            };
+        }(jQuery));
+        $(document).ready(function () {
+            $("#codeListNavItem").addClass("active font-weight-bold");
+            $("#keyAmount").inputFilter(function (value) {
+                return /^\d*$/.test(value); // Allow digits only, using a RegExp
+            });
+
+            var table = $('#keyTable').DataTable({
+                "language": {
+                    "lengthMenu": "Montrer _MENU_  codes par page",
+                    "zeroRecords": "Aucun code trouvé",
+                    "info": "Page _PAGE_ de _PAGES_",
+                    "infoEmpty": "Aucun code disponible",
+                    "infoFiltered": "(filtré de _MAX_ jeux)",
+                    "search": "Rechercher:",
+                    "paginate": {
+                        "first": "Premier",
+                        "last": "Dernier",
+                        "next": "Suivant",
+                        "previous": "Précédent"
+                    },
+                    "loadingRecords": "Chargement des codes...",
+                    "processing": "Chargement des codes...",
+                    "aria": {
+                        "sortAscending": ": Activer pour un filtrage ascendant",
+                        "sortDescending": ": Activer pour un filtrage descendant"
+                    }
+                }
+            });
+            $("#keyTable").on("click",
+                ".js-delete",
+                function (e) {
+                    e.preventDefault();
+                    var button = $(this);
+                    bootbox.confirm({
+                        message: "Êtes-vous sûr de vouloir supprimer cette clé?<br>Si un jeu est assigné a elle, il sera aussi suprimmé.",
+                        buttons: {
+                            confirm: {
+                                label: 'Oui',
+                                className: 'btn btn-sm btn-warning'
+                            },
+                            cancel: {
+                                label: 'Non',
+                                className: 'btn btn-sm btn-secondary'
                             }
-                        });
-                };
-            }(jQuery));
-            $(document).ready(function () {
-                $("#codeListNavItem").addClass("active font-weight-bold");
-                $("#keyAmount").inputFilter(function (value) {
-                    return /^\d*$/.test(value); // Allow digits only, using a RegExp
+                        },
+                        callback: function (result) {
+                            if (result) {
+                                $.ajax({
+                                    url: "/api/global/key/" + button.attr("data-customer-id"),
+                                    method: "DELETE",
+                                    success: function () {
+                                        table.row(button.parents("tr")).remove().draw();
+                                        $("#loading").remove();
+                                        history.pushState(null, null, window.location.href.split('#')[0]);
+                                        location.reload();
+                                    }
+                                });
+                            }
+                        }
+                    });
                 });
 
-                var table = $('#keyTable').DataTable({
-                    "language": {
-                        "lengthMenu": "Montrer _MENU_  codes par page",
-                        "zeroRecords": "Aucun code trouvé",
-                        "info": "Page _PAGE_ de _PAGES_",
-                        "infoEmpty": "Aucun code disponible",
-                        "infoFiltered": "(filtré de _MAX_ jeux)",
-                        "search": "Rechercher:",
-                        "paginate": {
-                            "first": "Premier",
-                            "last": "Dernier",
-                            "next": "Suivant",
-                            "previous": "Précédent"
-                        },
-                        "loadingRecords": "Chargement des codes...",
-                        "processing": "Chargement des codes...",
-                        "aria": {
-                            "sortAscending": ": Activer pour un filtrage ascendant",
-                            "sortDescending": ": Activer pour un filtrage descendant"
-                        }
+            $("#btnGenDropdown").on("click",
+                ".dropdown-item",
+                function (e) {
+                    e.preventDefault();
+                    var count = parseInt($(this).attr("value"));
+                    if (count !== 0) {
+                        jQuery.noConflict();
+                        $('#waitPleaseModal').modal('show');
+                        $.ajax({
+                            url: "../api/global/key/" + count,
+                            method: "POST",
+                            success: function () {
+                                $('#waitPleaseModal').modal('hide');
+                                history.pushState(null, null, window.location.href.split('#')[0]);
+                                $("#loading").remove();
+                                location.reload();
+                            }
+                        });
                     }
                 });
-                $("#keyTable").on("click",
-                    ".js-delete",
-                    function (e) {
-                        e.preventDefault();
-                        var button = $(this);
+            $("#btnDelDropdown").on("click",
+                ".dropdown-item",
+                function (e) {
+                    e.preventDefault();
+                    var type = $(this).attr("value");
+                    if (type === "nonActive") {
                         bootbox.confirm({
-                            message: "Êtes-vous sûr de vouloir supprimer cette clé?<br>Si un jeu est assigné a elle, il sera aussi suprimmé.",
+                            message: "Êtes-vous sûr de vouloir supprimer toutes les clés non-actives?",
                             buttons: {
                                 confirm: {
                                     label: 'Oui',
@@ -170,11 +267,44 @@
                             },
                             callback: function (result) {
                                 if (result) {
+                                    jQuery.noConflict();
+                                    $('#waitPleaseModal').modal('show');
                                     $.ajax({
-                                        url: "/api/global/key/" + button.attr("data-customer-id"),
+                                        url: "/api/global/key/" + -1,
                                         method: "DELETE",
                                         success: function () {
-                                            table.row(button.parents("tr")).remove().draw();
+                                            $('#waitPleaseModal').modal('hide');
+                                            history.pushState(null, null, window.location.href.split('#')[0]);
+                                            $("#loading").remove();
+                                            location.reload();
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    } else if (type === "all") {
+                        bootbox.confirm({
+                            message: "Êtes-vous sûr de vouloir supprimer toutes les clés?",
+                            buttons: {
+                                confirm: {
+                                    label: 'Oui',
+                                    className: 'btn btn-sm btn-warning'
+                                },
+                                cancel: {
+                                    label: 'Non',
+                                    className: 'btn btn-sm btn-secondary'
+                                }
+                            },
+                            callback: function (result) {
+                                if (result) {
+                                    console.log("ok");
+                                    jQuery.noConflict();
+                                    $('#waitPleaseModal').modal('show');
+                                    $.ajax({
+                                        url: "/api/global/key/" + -2,
+                                        method: "DELETE",
+                                        success: function () {
+                                            $('#waitPleaseModal').modal('hide');
                                             $("#loading").remove();
                                             history.pushState(null, null, window.location.href.split('#')[0]);
                                             location.reload();
@@ -183,117 +313,29 @@
                                 }
                             }
                         });
-                    });
+                    }
+                });
+            $("#createCustomCount").on("click",
+                function (e) {
+                    e.preventDefault();
+                    var count = parseInt($("#keyAmount").val());
+                    if (count !== 0) {
+                        jQuery.noConflict();
+                        $('#waitPleaseModal').modal('show');
+                        $.ajax({
+                            url: "../api/global/key/" + count,
+                            method: "POST",
+                            success: function () {
+                                $('#waitPleaseModal').modal('hide');
+                                history.pushState(null, null, window.location.href.split('#')[0]);
+                                $("#loading").remove();
+                                location.reload();
+                            }
+                        });
+                    }
+                });
 
-                $("#btnGenDropdown").on("click",
-                    ".dropdown-item",
-                    function (e) {
-                        e.preventDefault();
-                        var count = parseInt($(this).attr("value"));
-                        if (count !== 0) {
-                            jQuery.noConflict();
-                            $('#waitPleaseModal').modal('show');
-                            $.ajax({
-                                url: "../api/global/key/" + count,
-                                method: "POST",
-                                success: function () {
-                                    $('#waitPleaseModal').modal('hide');
-                                    history.pushState(null, null, window.location.href.split('#')[0]);
-                                    $("#loading").remove();
-                                    location.reload();
-                                }
-                            });
-                        }
-                    });
-                $("#btnDelDropdown").on("click",
-                    ".dropdown-item",
-                    function (e) {
-                        e.preventDefault();
-                        var type = $(this).attr("value");
-                        if (type === "nonActive") {
-                            bootbox.confirm({
-                                message: "Êtes-vous sûr de vouloir supprimer toutes les clés non-actives?",
-                                buttons: {
-                                    confirm: {
-                                        label: 'Oui',
-                                        className: 'btn btn-sm btn-warning'
-                                    },
-                                    cancel: {
-                                        label: 'Non',
-                                        className: 'btn btn-sm btn-secondary'
-                                    }
-                                },
-                                callback: function (result) {
-                                    if (result) {
-                                        jQuery.noConflict();
-                                        $('#waitPleaseModal').modal('show');
-                                        $.ajax({
-                                            url: "/api/global/key/" + -1,
-                                            method: "DELETE",
-                                            success: function () {
-                                                $('#waitPleaseModal').modal('hide');
-                                                history.pushState(null, null, window.location.href.split('#')[0]);
-                                                $("#loading").remove();
-                                                location.reload();
-                                            }
-                                        });
-                                    }
-                                }
-                            });
-                        } else if (type === "all") {
-                            bootbox.confirm({
-                                message: "Êtes-vous sûr de vouloir supprimer toutes les clés?",
-                                buttons: {
-                                    confirm: {
-                                        label: 'Oui',
-                                        className: 'btn btn-sm btn-warning'
-                                    },
-                                    cancel: {
-                                        label: 'Non',
-                                        className: 'btn btn-sm btn-secondary'
-                                    }
-                                },
-                                callback: function (result) {
-                                    if (result) {
-                                        console.log("ok");
-                                        jQuery.noConflict();
-                                        $('#waitPleaseModal').modal('show');
-                                        $.ajax({
-                                            url: "/api/global/key/" + -2,
-                                            method: "DELETE",
-                                            success: function () {
-                                                $('#waitPleaseModal').modal('hide');
-                                                $("#loading").remove();
-                                                history.pushState(null, null, window.location.href.split('#')[0]);
-                                                location.reload();
-                                            }
-                                        });
-                                    }
-                                }
-                            });
-                        }
-                    });
-                $("#createCustomCount").on("click",
-                    function (e) {
-                        e.preventDefault();
-                        var count = parseInt($("#keyAmount").val());
-                        if (count !== 0) {
-                            jQuery.noConflict();
-                            $('#waitPleaseModal').modal('show');
-                            $.ajax({
-                                url: "../api/global/key/" + count,
-                                method: "POST",
-                                success: function () {
-                                    $('#waitPleaseModal').modal('hide');
-                                    history.pushState(null, null, window.location.href.split('#')[0]);
-                                    $("#loading").remove();
-                                    location.reload();
-                                }
-                            });
-                        }
-                    });
-
-            });
-        </script>
-    }
+        });
+    </script>
+}
 

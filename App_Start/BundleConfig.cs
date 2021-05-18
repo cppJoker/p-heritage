@@ -10,7 +10,7 @@ namespace Projet_Heritage
         {
             bundles.Add(new ScriptBundle("~/bundles/lib").Include(
                 "~/Scripts/bootbox.min.js",
-                "~/Scripts/jquery-{version}.js",
+                "~/Scripts/jquery-3.6.0.js",
                 "~/Scripts/bootstrap.bundle.min.js",
                 "~/DataTables/datatables.min.js",
                 "~/Scripts/minimal-autocomplete-bootstrap/src/index.js"));
@@ -24,7 +24,7 @@ namespace Projet_Heritage
                 "~/Scripts/modernizr-*"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                "~/Content/site.css",
+                "~/Content/site_1.1.css",
                 "~/Content/bootstrap.css",
                 "~/DataTables/dataTables.css"));
         }

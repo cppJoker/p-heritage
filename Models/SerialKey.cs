@@ -15,5 +15,6 @@ namespace Projet_Heritage.Models
         public bool CanEdit { get; set; }
         public Game Game { get; set; }
         public int? GameID { get; set; }
+        public DateTime DateCreated { get; set; }
     }
 }

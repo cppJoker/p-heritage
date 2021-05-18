@@ -15,9 +15,50 @@
         </div>
     </div>
 </div>
+@{
+    char[] ratingSortingChar = {'f','e','d','c','b','a'};
+    List<SelectListItem> Realizations = new List<SelectListItem>();
+    foreach (var real in Model.RealizationList)
+    {
+        string text = "Projet intégrateur " + (real - 1) + " - " + real;
+        Realizations.Add(new SelectListItem()
+        {
+            Text = text,
+            Value = real.ToString(),
+            Selected = real == Model.Realization
+        });
+    }
+    Realizations.Add(new SelectListItem()
+    {
+        Text = "Toutes les années",
+        Value = "0",
+        Selected = Model.Realization == 0
+    });
+}
 <div class="table-bg">
     <h2>Jeux</h2>
+    <span style="font-style: italic">Les étoiles déterminent l'ordre d'affichage des jeux. Si vous souhaitez empêcher un jeu de s'afficher dans la liste publique, vous avez juste à ne mettre aucune étoile. Ce jeu ainsi que ses fichiers resteront toujours accessibles à vous.</span>
+    <br>
+    <br>
+    <span id="remainingGameText" class="text-success" style="font-style: italic">Tout les jeux ont été remis!</span>
     <hr />
+    @using (Html.BeginForm("Games", "Dashboard", FormMethod.Post, new
+    {
+    }))
+    {
+        <div class="form-group d-flex justify-content-end" style="margin-top: 5px; margin-bottom: 0; width: 100%">
+            <div class="input-group float-left" id="realYearContainer">
+                <label class="input-group-text" style="border-bottom-right-radius: 0; border-top-right-radius: 0" for="inputGroupSelect01">Réalisation</label>
+                @Html.DropDownListFor(m => m.Realization, Realizations, new
+                {
+                    @class = "form-control",
+                    id = "inputGroupSelect01"
+                })
+                <button style="border-bottom-left-radius: 0; border-top-left-radius: 0" type="submit" id="submitBtn" class="btn btn-secondary float-left"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    }
+    <br>
     <table id="gamesTable" class="table table-bordered table-hover">
         <thead>
             <tr>
@@ -26,6 +67,7 @@
                 <th>Membres</th>
                 <th>Matière</th>
                 <th>Groupe</th>
+                <th>Appréciation</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -36,9 +78,37 @@
                     @{
                         DateTime endDate = Model.HandInDateTime;
                         DateTime published = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(game.DatePublished, TimeZoneInfo.Local.Id, "Eastern Standard Time");
+                        TimeSpan difference = (published - endDate);
                         if (published > endDate)
                         {
-                            <td><a href="/Game?id=@game.Id" style="color:red">@game.Name<br>(en retard)</a></td>
+                            if (difference.Hours == 0 && difference.Days == 0)
+                            {
+                                <td><a href="/Game?id=@game.Id" style="color: red">@game.Name<br><span style="font-size: 14px"><i style="font-size: 13px" class="far fa-clock"></i> @difference.Minutes minutes</span></a></td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <a href="/Game?id=@game.Id" style="color:red">
+                                        @game.Name<br><span style="font-size: 14px">
+                                            <i style="font-size: 13px" class="far fa-clock"></i> @if (difference.Days != 0)
+                                            {
+                                                string postfix = difference.Days > 1 ? " jours" : " jour";
+                                                WriteLiteral(new HtmlString(difference.Days + postfix));
+                                            }
+                                            @if (difference.Hours != 0)
+
+                                            {
+                                                if (difference.Days != 0)
+                                                {
+                                                    WriteLiteral(new HtmlString(" et "));
+                                                }
+                                                string postfix = difference.Hours > 1 ? " heures" : " heure";
+                                                WriteLiteral(new HtmlString(difference.Hours + postfix));
+                                            }
+                                        </span>
+                                    </a>
+                                </td>
+                            }
                         }
                         else
                         {
@@ -46,11 +116,34 @@
                         }
                         <td>@published.ToString("yyyy/MM/dd")<br>@published.ToString("HH:mm")</td>
                     }
-                    <td>@game.TeamMembers</td>
                     <td>
-                        @game.Modules
+                        <ul style="padding-left: 14px">
+                            @foreach (var teamMember in game.TeamMembers.Split(','))
+                            {
+                                <li>@teamMember.Trim()</li>
+                            }
+                        </ul>
+                    </td>
+                    <td>
+                        <ul style="padding-left: 14px">
+                            @foreach (var module in game.Modules.Split(','))
+                            {
+                                <li>@module</li>
+                            }
+                        </ul>
                     </td>
                     <td>@game.Group</td>
+                    <td style="color: rgba(0,0,0,0)" class="text-unselectable">
+                        <span class="rating__result" data-game-id="@game.Id">@game.Stars</span>
+                        <div class="rating">
+                            <i class="rating__star @(game.Stars > 0?"fas":"far") fa-star"></i>
+                            <i class="rating__star @(game.Stars > 1?"fas":"far") fa-star"></i>
+                            <i class="rating__star @(game.Stars > 2?"fas":"far") fa-star"></i>
+                            <i class="rating__star @(game.Stars > 3?"fas":"far") fa-star"></i>
+                            <i class="rating__star @(game.Stars > 4?"fas":"far") fa-star"></i>
+                        </div>
+                        @(ratingSortingChar[game.Stars])
+                    </td>
                     <td>
                         <button data-game-id="@game.Id" style="display: block;" class="btn btn-sm btn-warning js-update">Modifier</button>
                         <button data-game-id="@game.Id" style="display: block; margin-top: 10px" class="btn btn-sm btn-danger js-delete">Supprimer</button>
@@ -66,69 +159,143 @@
 
 @section scripts
 {
-        <script>
-            $(document).ready(function () {
-                $("#gameListNavItem").addClass("active font-weight-bold");
-                var table = $('#gamesTable').DataTable({
-                    "language": {
-                        "lengthMenu": "Montrer _MENU_  jeux par page",
-                        "zeroRecords": "Aucun jeu trouvé",
-                        "info": "Page _PAGE_ de _PAGES_",
-                        "infoEmpty": "Aucun jeu disponible",
-                        "infoFiltered": "(filtré de _MAX_ jeux)",
-                        "search": "Rechercher:",
-                        "paginate": {
-                            "first": "Premier",
-                            "last": "Dernier",
-                            "next": "Suivant",
-                            "previous": "Précédent"
-                        },
-                        "loadingRecords": "Chargement des jeux...",
-                        "processing": "Chargement des jeux...",
-                        "aria": {
-                            "sortAscending": ": Activer pour un filtrage ascendant",
-                            "sortDescending": ": Activer pour un filtrage descendant"
-                        }
-                    }
-                });
-
-                $("#gamesTable").on("click",
-                    ".js-delete",
-                    function () {
-                        var button = $(this);
-                        bootbox.confirm({
-                            message: "Êtes-vous sûr de vouloir supprimer ce jeu?",
-                            buttons: {
-                                confirm: {
-                                    label: 'Oui',
-                                    className: 'btn btn-sm btn-warning'
-                                },
-                                cancel: {
-                                    label: 'Non',
-                                    className: 'btn btn-sm btn-secondary'
-                                }
-                            },
-                            callback: function (result) {
-                                if (result) {
-                                    $.ajax({
-                                        url: "/api/global/" + button.attr("data-game-id"),
-                                        method: "DELETE",
-                                        success: function () {
-                                            table.row(button.parents("tr")).remove().draw();
-                                            location.reload();
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    });
-                $("#gamesTable").on("click",
-                    ".js-update",
-                    function () {
-                        var button = $(this);
-                        window.location.href = "/Dashboard/GameEdit?id=" + button.attr("data-game-id");
-                    });
-
+    <script>
+        $(document).ready(function() {
+            $("#gameListNavItem").addClass("active font-weight-bold");
+            Object.defineProperty(Array.prototype, 'chunk', {
+                value: function (chunkSize) {
+                    var R = [];
+                    for (var i = 0; i < this.length; i += chunkSize)
+                        R.push(this.slice(i, i + chunkSize));
+                    return R;
+                }
             });
-        </script>
-    }
+            var ratingSortingChar = ['f', 'e', 'd', 'c', 'b', 'a'];
+            var ratingStars = [...document.getElementsByClassName("rating__star")];
+            var ratingResult = [...document.getElementsByClassName("rating__result")];
+            var newStars = ratingStars.chunk(5);
+            for (var i = 0; i < newStars.length; i++) {
+                var chunkedStars = newStars[i];
+                executeRating(chunkedStars, ratingResult[i]);
+            }
+            console.log(ratingResult);
+            console.log(newStars);
+            var table = $('#gamesTable').DataTable({
+                "language": {
+                    "lengthMenu": "Montrer _MENU_  jeux par page",
+                    "zeroRecords": "Aucun jeu trouvé",
+                    "info": "Page _PAGE_ de _PAGES_",
+                    "infoEmpty": "Aucun jeu disponible",
+                    "infoFiltered": "(filtré de _MAX_ jeux)",
+                    "search": "Rechercher:",
+                    "paginate": {
+                        "first": "Premier",
+                        "last": "Dernier",
+                        "next": "Suivant",
+                        "previous": "Précédent"
+                    },
+                    "loadingRecords": "Chargement des jeux...",
+                    "processing": "Chargement des jeux...",
+                    "aria": {
+                        "sortAscending": ": Activer pour un filtrage ascendant",
+                        "sortDescending": ": Activer pour un filtrage descendant"
+                    }
+                },
+                "lengthMenu": [[25, 50, 100, -1], [25, 50, 100, "Tout"]]
+            });
+
+            $("#gamesTable").on("click",
+                ".js-delete",
+                function() {
+                    var button = $(this);
+                    bootbox.confirm({
+                        message: "Êtes-vous sûr de vouloir supprimer ce jeu?",
+                        buttons: {
+                            confirm: {
+                                label: 'Oui',
+                                className: 'btn btn-sm btn-warning'
+                            },
+                            cancel: {
+                                label: 'Non',
+                                className: 'btn btn-sm btn-secondary'
+                            }
+                        },
+                        callback: function(result) {
+                            if (result) {
+                                $.ajax({
+                                    url: "/api/global/" + button.attr("data-game-id"),
+                                    method: "DELETE",
+                                    success: function() {
+                                        table.row(button.parents("tr")).remove().draw();
+                                        location.reload();
+                                    }
+                                });
+                            }
+                        }
+                    });
+                });
+            $("#gamesTable").on("click",
+                ".js-update",
+                function() {
+                    var button = $(this);
+                    window.location.href = "/Dashboard/GameEdit?id=" + button.attr("data-game-id");
+                });
+            
+            function executeRating(stars, result) {
+                var starClassActive = "rating__star fas fa-star";
+                var starClassUnactive = "rating__star far fa-star";
+                var starsLength = stars.length;
+                var i;
+                stars.map((star) => {
+                    star.onclick = () => {
+                        i = stars.indexOf(star);
+                        if (star.className.indexOf(starClassUnactive) !== -1) {
+                            printRatingResult(result, i + 1);
+                            for (i; i >= 0; --i) stars[i].className = starClassActive;
+                        } else {
+                            printRatingResult(result, i);
+                            for (i; i < starsLength; ++i) stars[i].className = starClassUnactive;
+                        }
+                    };
+                });
+            }
+            $.ajax({
+                type: "GET",
+                url: '/api/global/key/freekeys',
+                success: function (response) {
+                    if (response === 1) {
+                        $("#remainingGameText").text("Attention, un jeu n'a pas encore été remis!");
+                        $("#remainingGameText").removeClass("text-success").addClass("text-danger");
+                    }
+                    else if (response !== 0) {
+                        $("#remainingGameText").text("Attention, " + response + " jeux n'ont pas encore été remis!");
+                        $("#remainingGameText").removeClass("text-success").addClass("text-danger");
+                    }
+                }
+            });
+            function printRatingResult(result, num = 0) {
+                var tdParent = result.parentNode;
+                result.textContent = num;
+                $(tdParent).each(function () {
+                    event.preventDefault();
+                    jQuery.noConflict();
+                    $('#waitPleaseModal').modal('show');
+                    $.ajax({
+                        url: "/api/global/game/editRating/" + result.getAttribute("data-game-id") + "/" + num,
+                        method: "PUT",
+                        success: function() {
+                            console.log($(tdParent).children());
+                            var child = $(tdParent).children();  
+                            $(tdParent).html(child);
+                            $(tdParent).append(ratingSortingChar[num]);
+                            location.reload();
+                        }
+                    });
+                });
+            }
+
+            
+        });
+    </script>
+}
+

@@ -26,13 +26,25 @@ namespace Projet_Heritage.Controllers
             _context.Dispose();
         }
         // GET: Dashboard
-        public ActionResult Games(int id = 0)
+        public ActionResult Games(DashboardGameListViewModel viewModel)
         {
-            var viewModel = new DashboardGameListViewModel()
+            List<Game> games = _context.Games.ToList();
+            SortedSet<int> realYears = new SortedSet<int>();
+            foreach (var game in games)
             {
-                Games = _context.Games.ToList(),
-                HandInDateTime = _context.PlatformSettings.Single(c => c.Id == 1).HandInDateTime
-            };
+                realYears.Add(game.DatePublished.Year);
+            }
+            viewModel.RealizationList = realYears.OrderByDescending(x => x).ToList();
+            if (viewModel.Realization == null)
+            {
+                viewModel.Realization = realYears.Last();
+            }
+            if (viewModel.Realization != 0)
+            {
+                games = games.Where(w => w.DatePublished.Year == viewModel.Realization).ToList();
+            }
+            viewModel.Games = games;
+            viewModel.HandInDateTime = _context.PlatformSettings.Single(c => c.Id == 1).HandInDateTime;
             return View("GameList", viewModel);
         }
 
@@ -234,19 +246,29 @@ namespace Projet_Heritage.Controllers
             return View("GameEdit", viewModel);
         }
 
-        public ActionResult Keys()
+        public ActionResult Keys(KeyListViewModel viewModel)
         {
             var keys = _context.SerialKeys.ToList();
-            List<KeyGameViewModel> view = new List<KeyGameViewModel>();
+            var games = _context.Games.ToList();
+            SortedSet<int> realYears = new SortedSet<int>();
             foreach (var key in keys)
             {
-                view.Add(new KeyGameViewModel()
-                {
-                    Key = key,
-                    Game = _context.Games.SingleOrDefault(c => c.Id == key.GameID)
-                });
+                realYears.Add(key.DateCreated.Year);
             }
-            return View("KeyList", view);
+            viewModel.RealizationList = realYears.OrderByDescending(x => x).ToList();
+            if (viewModel.Realization == null)
+            {
+                viewModel.Realization = realYears.Last();
+            }
+            if (viewModel.Realization != 0)
+            {
+                keys = keys.Where(w => w.DateCreated.Year == viewModel.Realization).ToList();
+            }
+            foreach (var key in keys)
+            {
+                viewModel.keyGamePair.Add(key, games.SingleOrDefault(c => c.Id == key.GameID));
+            }
+            return View("KeyList", viewModel);
         }
 
     }

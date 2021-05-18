@@ -269,6 +269,14 @@
     <Compile Include="Migrations\202105031833111_sixTeen.designer.cs">
       <DependentUpon>202105031833111_sixTeen.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202105101847314_SevenTeen.cs" />
+    <Compile Include="Migrations\202105101847314_SevenTeen.designer.cs">
+      <DependentUpon>202105101847314_SevenTeen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202105181530444_EightTeen.cs" />
+    <Compile Include="Migrations\202105181530444_EightTeen.designer.cs">
+      <DependentUpon>202105181530444_EightTeen.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Game.cs" />
@@ -283,7 +291,7 @@
     <Compile Include="ViewModel\GameFormViewModel.cs" />
     <Compile Include="ViewModel\GameListViewModel.cs" />
     <Compile Include="ViewModel\GamePageViewModel.cs" />
-    <Compile Include="ViewModel\KeyGameViewModel.cs" />
+    <Compile Include="ViewModel\KeyListViewModel.cs" />
     <Compile Include="ViewModel\ReviewGameViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -385,7 +393,7 @@
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
-    <Content Include="Content\Site.css" />
+    <Content Include="Content\Site_1.1.css" />
     <Content Include="Images\Clouds.mp4" />
     <Content Include="Images\logo_grad.png" />
     <Content Include="Scripts\bootbox.min.js" />
@@ -530,6 +538,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202105031833111_sixTeen.resx">
       <DependentUpon>202105031833111_sixTeen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202105101847314_SevenTeen.resx">
+      <DependentUpon>202105101847314_SevenTeen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202105181530444_EightTeen.resx">
+      <DependentUpon>202105181530444_EightTeen.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

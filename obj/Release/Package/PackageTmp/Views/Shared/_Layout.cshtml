@@ -38,11 +38,11 @@
         <div class="navbar-collapse collapse" id="navbarSupportedContent">
             @if (User.Identity.IsAuthenticated)
             {
-                <ul class="nav navbar-nav mr-auto">
-                    <li id="gameListNavItem" class="nav-item"><a href="/Dashboard/Games" class="nav-link">Listes des jeux</a></li>
-                    <li id="codeListNavItem" class="nav-item"><a href="~/Dashboard/Keys" class="nav-link">Listes des codes</a></li>
-                    <li id="commentListNavItem" class="nav-item"><a href="~/Dashboard/Comments" class="nav-link">Listes des commentaires</a></li>
-                    <li id="SettingsNavItem" class="nav-item"><a href="~/Dashboard/Settings" class="nav-link">Paramètres</a></li>
+                <ul class="nav navbar-nav mr-auto ml-auto">
+                    <li id="gameListNavItem" class="nav-item"><a style="font-size: 18px; margin-left: 6px;margin-right: 6px" href="/Dashboard/Games" class="nav-link"><i style="font-size: 20px" class="fas fa-running"></i> Jeux</a></li>
+                    <li id="codeListNavItem" class="nav-item"><a style="font-size: 18px;margin-left: 6px;margin-right: 6px" href="~/Dashboard/Keys" class="nav-link"><i class="fas fa-key"></i> Codes d'équipe</a></li>
+                    <li id="commentListNavItem" class="nav-item"><a style="font-size: 18px;margin-left: 6px;margin-right: 6px" href="~/Dashboard/Comments" class="nav-link"><i class="fas fa-comments"></i> Commentaires</a></li>
+                    <li id="SettingsNavItem" class="nav-item"><a style="font-size: 18px;margin-left: 6px;margin-right: 6px" href="~/Dashboard/Settings" class="nav-link"><i class="fas fa-sliders-h"></i> Paramètres</a></li>
                 </ul>
             }
             <ul class="navbar-nav ml-auto">

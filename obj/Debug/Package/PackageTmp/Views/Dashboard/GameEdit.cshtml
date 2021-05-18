@@ -63,7 +63,7 @@
 </div>
 
 <div class="row" style="justify-content: center; align-items: center; display: flex; width: 600px; margin: auto;">
-    <div class="table-bg" style="justify-content: center; align-items: center; display: flex;">
+    <div class="table-bg" style="margin-top: 15px; justify-content: center; align-items: center; display: flex;">
         <div class="col-md-12">
             <h2 style="margin-bottom: 20px">Modifier un jeu</h2>
             <div id="errAlert" class="alert alert-danger alert-dismissible fade show col-md-12" style="@(Model.HasError?Html.Raw("display: inherit;"):Html.Raw("display: none;"))" role="alert">
@@ -238,7 +238,7 @@
                     @Html.Label("Soumettre le fichier zip (optionnel)")
                     <br>
                     <label class="btn btn-sm btn-outline-dark form-control col-md-12">
-                        <i class="far fa-file-archive"></i><span id="ressource">&nbsp;Soumettre un nouveau fichier (1 GB maximum)</span><input id="ress" type="file" style="display: none;" name="ResourceFile" required>
+                        <i class="far fa-file-archive"></i><span id="ressource">&nbsp;Soumettre un nouveau fichier</span><input id="ress" type="file" style="display: none;" name="ResourceFile" required>
                     </label>
 
                 </div>
@@ -340,7 +340,7 @@
                     }
                     if (!blnValid) {
                         $(this).val("");
-                        $("#ressource").text(" Soumettre un nouveau fichier (1 GB maximum)");
+                        $("#ressource").text(" Soumettre un nouveau fichier");
                         $("#errAlert").css({ "display": "inherit" });
                         $("#errMessage").text("Le fichier n'est pas un zip ou contient des caractères spéciaux.");
                         $("html, body").animate({ scrollTop: 0 }, "slow");

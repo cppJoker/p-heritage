@@ -32,6 +32,7 @@ namespace Projet_Heritage.ViewModel
         public YearContent YearCont { get; set; } = YearContent.Both;
         public ModuleContent ModuleCont { get; set; } = ModuleContent.All;
         public List<Game> Games  { get; set; }
-
+        public int? Realization { get; set; } = null;
+        public List<int> RealizationList { get; set; } = new List<int>();
     }
 }
