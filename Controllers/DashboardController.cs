@@ -111,6 +111,7 @@ namespace Projet_Heritage.Controllers
                     return false;
             }
         }
+
         public ActionResult EditGame(GameFormViewModel viewModel)
         {
             if (ModelState.IsValid)

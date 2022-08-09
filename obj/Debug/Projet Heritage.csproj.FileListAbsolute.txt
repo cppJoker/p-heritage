@@ -274,5 +274,5 @@ E:\Projects\p-heritage\obj\Debug\Projet Heritage.csproj.CoreCompileInputs.cache
 E:\Projects\p-heritage\obj\Debug\Projet Heritage.csproj.CopyComplete
 E:\Projects\p-heritage\obj\Debug\Projet Heritage.dll
 E:\Projects\p-heritage\obj\Debug\Projet Heritage.pdb
-E:\Projects\p-heritage\obj\Debug\Projet Heritage.csprojAssemblyReference.cache
 E:\Projects\p-heritage\obj\Debug\Projet_Heritage.Migrations.EightTeen.resources
+E:\Projects\p-heritage\obj\Debug\Projet Heritage.csproj.AssemblyReference.cache
